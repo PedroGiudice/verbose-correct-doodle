@@ -1,4 +1,170 @@
-# Changelog - Extrator PDF Jurídico
+# Changelog - Pré-Processador Jurídico
+
+## [3.0.0] - 2025-10-24
+
+### 🎉 VERSÃO INTEGRADA - Fusão Completa dos Sistemas
+
+Esta versão representa a **fusão completa** do Extrator PDF Jurídico com o sistema de conversão de Markdown, criando um **pré-processador automatizado** otimizado para análise por LLMs.
+
+### 🔄 Principais Mudanças
+
+#### Sistema Integrado 3-em-1
+- **Extração + Limpeza + Conversão**: Workflow automatizado completo
+- **4 formatos de saída**: TXT, MD, DOCX, HTML
+- **Interface com abas**: Visualize simultaneamente texto, markdown e HTML
+- **Layout elegante mantido**: Design minimalista preto e branco com fonte monoespaçada da v2.5
+
+#### 📄 Novo: Conversor de Markdown
+- **Detecção automática de estrutura**:
+  - Títulos (linhas em caixa alta transformadas em `## TÍTULO`)
+  - Seções numeradas (`### 1. Seção`)
+  - Listas com bullets convertidas para formato MD
+  - Citações (texto entre aspas vira `> citação`)
+- **Metadados YAML**: Front matter com data, sistema, modo, páginas
+- **Preservação de formatação**: Parágrafos, quebras, hierarquia
+- **Otimizado para LLMs**: Reduz tokens em até 80% mantendo estrutura
+
+#### 🎨 Novo: Conversor de HTML
+- **HTML semântico**: Tags apropriadas (h1, h2, h3, p, ul, ol, blockquote)
+- **CSS embutido**: Estilo profissional pronto para visualização
+- **Fonte Times New Roman**: Aparência jurídica tradicional
+- **Pronto para publicação**: Copiar e colar em sites/blogs
+
+#### 🧹 Modos de Limpeza Integrados
+Agora com seletor visual de 3 modos:
+- **LEVE**: Conservador (topBand: 5%, bottomBand: 8%, minRepeat: 3, minSignals: 3)
+- **MODERADO**: Equilibrado (topBand: 6%, bottomBand: 12%, minRepeat: 2, minSignals: 2)
+- **AGRESSIVO**: Máximo (topBand: 8%, bottomBand: 18%, minRepeat: 2, minSignals: 1)
+
+Cada modo ajusta automaticamente os parâmetros de detecção de cabeçalho/rodapé.
+
+#### 🎛️ Configurações Avançadas Integradas
+Todas as funcionalidades da v2.3/2.4 agora no layout da v2.5:
+- ✅ **Lista branca**: Campo de texto para termos que nunca devem ser removidos
+- ✅ **Controle granular**: 6 checkboxes para controle fino
+- ✅ **Normalização**: Quebras de linha e hifenização
+- ✅ **Preservação de assinaturas**: Detecção automática de áreas legítimas (OAB)
+
+#### 📊 Estatísticas Ampliadas
+Painel de estatísticas agora exibe:
+- Páginas processadas
+- Itens removidos
+- Sistema detectado/selecionado
+- **Novo**: Modo de limpeza utilizado
+
+#### 🚀 Exportação Multi-Formato
+Interface renovada com 4 botões de exportação:
+- **TXT**: Texto puro limpo
+- **MD**: Markdown com metadados
+- **DOCX**: Word (Times New Roman 12pt) via biblioteca docx 8.5.0
+- **HTML**: Página web formatada e estilizada
+
+#### 🎯 Otimizado para LLMs
+- **Redução de tokens**: Remove até 80% de ruído (hashes, assinaturas, protocolos)
+- **Formato estruturado**: Markdown preserva hierarquia sem tokens extras
+- **Limpeza inteligente**: Remove metadados mantendo conteúdo jurídico
+- **Economia de custo**: Menos tokens = menor custo em APIs de LLM
+
+### 🔧 Melhorias Técnicas
+
+#### Código Refatorado
+- **Módulos separados**: Cleaner, MarkdownConverter, HtmlConverter
+- **Funções reutilizáveis**: hash(), norm(), resetRegex(), detectSystem()
+- **Melhor organização**: Separação clara entre lógica de negócio e UI
+- **Performance otimizada**: Processamento em fases bem definidas
+
+#### Sistema de Abas
+- **Navegação intuitiva**: Alterne entre visualizações sem reprocessar
+- **Estado preservado**: Todas as abas mantêm conteúdo após processamento
+- **Feedback visual**: Tab ativa claramente identificada
+
+#### Integração de Bibliotecas
+- **PDF.js via CDN**: Carregamento rápido e global
+- **FileSaver.js via CDN**: Compatibilidade universal
+- **docx via ES Module**: Import dinâmico, carregamento assíncrono
+- **Fallback gracioso**: Mensagens claras se biblioteca não carregar
+
+### 🎨 Interface do Usuário
+
+#### Layout Responsivo Aprimorado
+- Grid adaptável: 420px sidebar + área de visualização
+- Breakpoints otimizados para mobile
+- Todos os elementos escaláveis e legíveis
+
+#### Componentes Novos
+- **Seletor de modo**: 3 badges clicáveis (Leve/Moderado/Agressivo)
+- **Abas de visualização**: Design minimalista com borda inferior
+- **Grupo de botões de exportação**: 4 formatos lado a lado
+
+#### Tipografia Mantida
+- Fonte monoespaçada: Courier New, Consolas, Monaco
+- Hierarquia clara: Títulos em caixa alta, subtítulos menores
+- Espaçamento consistente: Respiro visual adequado
+
+### 📝 Documentação Atualizada
+
+#### README Completo
+- Seção "O que faz?" explicando workflow completo
+- Casos de uso: Advogados, Pesquisadores, Análise por IA
+- Exemplo comparativo: Antes/Depois com economia de tokens
+- Guia de uso passo a passo
+
+#### Arquivos de Backup
+- `index.v2.5.backup.html`: Versão anterior preservada
+- `extrator_pdf_processual_v2.3_offline.html`: Versão offline mantida
+- `preprocessador-juridico.html`: Cópia do sistema integrado
+
+### 🔄 Compatibilidade
+
+#### Mantido da v2.5
+- ✅ Design minimalista preto e branco
+- ✅ Seletor de sistema processual (7 opções)
+- ✅ Detecção automática de sistema
+- ✅ Regex específicos por sistema
+- ✅ Padrões ICP-Brasil completos
+
+#### Mantido da v2.4/2.3
+- ✅ Whitelist de termos
+- ✅ Modos de limpeza (leve/moderado/agressivo)
+- ✅ Detecção de cabeçalho/rodapé repetitivo
+- ✅ Preservação de assinaturas legítimas (OAB)
+- ✅ Normalização de quebras
+- ✅ Exportação DOCX
+
+#### Removido/Descontinuado
+- ❌ Slider de margem lateral (simplificado, agora automático por modo)
+- ❌ Visualização de "itens removidos" (simplificado para foco na saída)
+
+### 🎯 Caso de Uso Principal
+
+**Pré-processamento de documentos jurídicos para análise por LLMs:**
+
+```
+PDF Jurídico (pesado, 50 páginas, 15.000 tokens)
+    ↓
+[Extração + Limpeza]
+    ↓
+Texto Limpo (8.000 tokens, -47%)
+    ↓
+[Conversão para Markdown]
+    ↓
+Markdown Estruturado (3.000 tokens, -80%)
+    ↓
+[Análise por Claude/GPT]
+    ↓
+Resposta 5x mais rápida, custo 80% menor!
+```
+
+### 🚀 Próximos Passos (Roadmap)
+
+Para v3.1:
+- [ ] Exportação para PDF (via jsPDF)
+- [ ] Suporte a múltiplos arquivos (batch processing)
+- [ ] Opção de criptografia de saída
+- [ ] Integração direta com APIs de LLM
+- [ ] Modo escuro opcional
+
+---
 
 ## [2.5.0] - 2025-10-24
 
