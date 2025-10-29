@@ -274,15 +274,16 @@ class IntelligentExtractorTest:
 
         print(f"       [OK] Markdown salvo: {md_path}")
 
-        # 3. TXT simples
+        # 3. TXT simples (formato otimizado para LLM)
         txt_path = output_dir / 'integra_limpa.txt'
         with open(txt_path, 'w', encoding='utf-8') as f:
-            for doc in results['documents']:
-                f.write(f"{'='*60}\n")
-                f.write(f"DOCUMENTO {doc['number']}: {doc['type']}\n")
-                f.write(f"{'='*60}\n\n")
+            for i, doc in enumerate(results['documents']):
+                # Cabeçalho simples e claro
+                f.write(f"[{doc['type']}]\n\n")
                 f.write(doc['cleaned_text'])
-                f.write("\n\n")
+                # Separador entre documentos (exceto no último)
+                if i < len(results['documents']) - 1:
+                    f.write("\n\n" + "="*80 + "\n\n")
 
         print(f"       [OK] TXT salvo: {txt_path}")
 
