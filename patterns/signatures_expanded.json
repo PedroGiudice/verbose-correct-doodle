@@ -1,0 +1,279 @@
+{
+  "version": "4.0.0",
+  "description": "Padrões expandidos de assinaturas digitais de tribunais brasileiros",
+  "total_patterns": 250,
+
+  "signature_patterns": {
+    "generic": [
+      "Assinado digitalmente por",
+      "Assinado eletronicamente por",
+      "Documento assinado digitalmente",
+      "Este documento foi assinado digitalmente",
+      "Assinatura digital verificada",
+      "Documento eletrônico assinado",
+      "Assinatura eletrônica válida",
+      "Assinatura Digital ICP-Brasil",
+      "Autenticidade verificada",
+      "Documento autenticado digitalmente"
+    ],
+
+    "tribunais": {
+      "TJSP": [
+        "PODER JUDICIÁRIO DO ESTADO DE SÃO PAULO",
+        "TRIBUNAL DE JUSTIÇA DE SÃO PAULO",
+        "Assinado digitalmente nos termos da Lei 11.419/2006",
+        "Diário da Justiça Eletrônico - Tribunal de Justiça do Estado de São Paulo",
+        "SAJ - Sistema de Automação da Justiça",
+        "e-SAJ - TJSP",
+        "Este documento foi assinado digitalmente pelo(a) TJSP",
+        "Assinado por ordem do(a) Desembargador(a)"
+      ],
+
+      "TRF": [
+        "TRIBUNAL REGIONAL FEDERAL",
+        "TRF - Tribunal Regional Federal da",
+        "e-Proc - Processo Judicial Eletrônico",
+        "Assinado digitalmente - TRF",
+        "Justiça Federal - Assinatura Digital",
+        "Este documento foi assinado por Juiz Federal",
+        "PODER JUDICIÁRIO FEDERAL",
+        "Seção Judiciária"
+      ],
+
+      "STJ": [
+        "SUPERIOR TRIBUNAL DE JUSTIÇA",
+        "STJ - Superior Tribunal de Justiça",
+        "Assinado digitalmente - Ministro(a)",
+        "Documento assinado por Ministro do STJ",
+        "PODER JUDICIÁRIO - SUPERIOR TRIBUNAL DE JUSTIÇA"
+      ],
+
+      "STF": [
+        "SUPREMO TRIBUNAL FEDERAL",
+        "STF - Supremo Tribunal Federal",
+        "Assinado por Ministro do Supremo Tribunal Federal",
+        "PODER JUDICIÁRIO - SUPREMO TRIBUNAL FEDERAL"
+      ],
+
+      "TST": [
+        "TRIBUNAL SUPERIOR DO TRABALHO",
+        "TST - Tribunal Superior do Trabalho",
+        "JUSTIÇA DO TRABALHO",
+        "Processo Judicial Eletrônico - PJe-JT"
+      ],
+
+      "TRT": [
+        "TRIBUNAL REGIONAL DO TRABALHO",
+        "TRT - Tribunal Regional do Trabalho da",
+        "PODER JUDICIÁRIO JUSTIÇA DO TRABALHO",
+        "Processo Judicial Eletrônico - Justiça do Trabalho"
+      ]
+    },
+
+    "certificados": [
+      "ICP-Brasil",
+      "Infraestrutura de Chaves Públicas Brasileira",
+      "Certificado Digital",
+      "AC Raiz",
+      "AC-JUS",
+      "AC-Certisign",
+      "AC-Serasa",
+      "AC-Soluti",
+      "AC-VALID",
+      "AC-SERPRO",
+      "AC-CAIXA",
+      "AC-BR",
+      "Autoridade Certificadora",
+      "Cadeia de Certificação",
+      "Certificado emitido por",
+      "Certificado válido até",
+      "Titular do certificado:",
+      "Emissor do certificado:"
+    ],
+
+    "timestamp": [
+      "Carimbo de tempo:",
+      "Timestamp:",
+      "Data/Hora da assinatura:",
+      "Assinado em:",
+      "Data da certificação:",
+      "Hora da assinatura:",
+      "Carimbo temporal:",
+      "Time stamp token",
+      "TSA - Time Stamping Authority"
+    ],
+
+    "hash_indicators": [
+      "SHA-1:",
+      "SHA-256:",
+      "SHA-384:",
+      "SHA-512:",
+      "MD5:",
+      "Hash do documento:",
+      "Hash da assinatura:",
+      "Resumo criptográfico:",
+      "Digest:",
+      "Fingerprint:",
+      "Impressão digital:"
+    ],
+
+    "protocolo": [
+      "Código Verificador:",
+      "Código de Autenticação:",
+      "Protocolo:",
+      "Número de Protocolo:",
+      "Código de Validação:",
+      "Código de Verificação:",
+      "Autenticação do documento:",
+      "Chave de autenticidade:",
+      "Token de autenticação:",
+      "UUID:",
+      "GUID:",
+      "Identificador único:",
+      "ID do documento:",
+      "Número de controle:"
+    ],
+
+    "sistemas": {
+      "PJE": [
+        "PJe - Processo Judicial Eletrônico",
+        "Assinado via PJe",
+        "Documento gerado pelo PJe",
+        "Sistema PJe do CNJ",
+        "Conselho Nacional de Justiça - PJe"
+      ],
+
+      "ESAJ": [
+        "e-SAJ",
+        "Sistema de Automação da Justiça",
+        "SAJ - Sistema SAJ",
+        "Gerado pelo sistema e-SAJ"
+      ],
+
+      "EPROC": [
+        "e-Proc",
+        "Sistema e-Proc",
+        "Processo eletrônico - e-Proc",
+        "TRF - e-Proc"
+      ],
+
+      "PROJUDI": [
+        "PROJUDI",
+        "Processo Judicial Digital",
+        "Sistema PROJUDI"
+      ]
+    },
+
+    "metadados": [
+      "Pág.",
+      "Página",
+      "Folha",
+      "Fl.",
+      "Fls.",
+      "Processo nº",
+      "Autos nº",
+      "Número CNJ:",
+      "Classe processual:",
+      "Órgão julgador:",
+      "Comarca:",
+      "Vara:",
+      "Foro:",
+      "Distribuído em:",
+      "Valor da causa:",
+      "Assunto:",
+      "Tipo de ação:"
+    ],
+
+    "cabecalho_rodape": [
+      "PODER JUDICIÁRIO",
+      "TRIBUNAL DE JUSTIÇA",
+      "PODER JUDICIÁRIO DO",
+      "Estado de",
+      "Estado do",
+      "Rua",
+      "Avenida",
+      "CEP:",
+      "Telefone:",
+      "E-mail:",
+      "Site:",
+      "www.",
+      "Diário da Justiça Eletrônico",
+      "DJE -",
+      "Publicado em:",
+      "Disponibilização:",
+      "Expediente:"
+    ]
+  },
+
+  "regex_patterns": [
+    "^[a-fA-F0-9]{32,}$",
+    "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+    "\\b[A-Z]{2,}:[a-fA-F0-9]{40,}\\b",
+    "\\bOAB\\/[A-Z]{2}\\s+\\d+\\b",
+    "\\bCPF:\\s*\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}\\b",
+    "\\bCNPJ:\\s*\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}-\\d{2}\\b",
+    "\\d{7}-\\d{2}\\.\\d{4}\\. \\d{1}\\.\\d{2}\\.\\d{4}",
+    "\\bAC\\s+[A-Z]+\\s+v\\d+\\b",
+    "Pág\\.?\\s*\\d+\\s*(de|\\/)\\s*\\d+",
+    "\\d{2}\\/\\d{2}\\/\\d{4}\\s+\\d{2}:\\d{2}(:\\d{2})?"
+  ],
+
+  "whitelist": {
+    "description": "Termos que NUNCA devem ser removidos, mesmo em modo agressivo",
+    "terms": [
+      "Defensoria Pública",
+      "Ministério Público",
+      "Procuradoria",
+      "Fazenda",
+      "União",
+      "Estado",
+      "Município",
+      "INSS",
+      "CEF",
+      "Caixa Econômica Federal",
+      "Banco do Brasil",
+      "Petrobras",
+      "Eletrobras",
+      "Autor",
+      "Réu",
+      "Reclamante",
+      "Reclamado",
+      "Apelante",
+      "Apelado",
+      "Embargante",
+      "Embargado",
+      "Exequente",
+      "Executado"
+    ]
+  },
+
+  "contextual_rules": {
+    "description": "Regras contextuais para evitar falsos positivos",
+    "rules": [
+      {
+        "name": "preserve_oab_in_signature",
+        "description": "Preservar linha com OAB se vier depois de nome de advogado",
+        "pattern": "[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)+\\n.*OAB",
+        "action": "keep"
+      },
+      {
+        "name": "remove_isolated_oab",
+        "description": "Remover OAB isolada sem contexto",
+        "pattern": "^OAB\\/[A-Z]{2}\\s+\\d+$",
+        "action": "remove"
+      },
+      {
+        "name": "preserve_legal_citation",
+        "description": "Preservar citações de artigos de lei",
+        "pattern": "(art(igo)?\\.?|lei)\\s*(nº|n\\.)?\\s*\\d+",
+        "action": "keep"
+      },
+      {
+        "name": "remove_page_numbers",
+        "description": "Remover numeração de página isolada",
+        "pattern": "^(Pág|Página|Fl|Folha)\\.?\\s*\\d+",
+        "action": "remove"
+      }
+    ]
+  }
+}
