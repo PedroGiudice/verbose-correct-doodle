@@ -756,7 +756,7 @@
   <script type="module">
     (async () => {
       try {
-        const docxNS = await import('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js');
+        const docxNS = await import('https://cdn.jsdelivr.net/npm/docx@8.5.0/+esm');
         window.docx = docxNS;
         console.log('✓ Biblioteca DOCX carregada');
       } catch (e) {
@@ -849,16 +849,7 @@
       previewDiv.style.lineHeight = lineHeight;
     }
 
-    // Event listeners para o editor Markdown
-    const outputMarkdown = $('#outputMarkdown');
-    if (outputMarkdown) {
-      // Atualizar preview enquanto digita (com debounce)
-      let markdownTimeout;
-      outputMarkdown.addEventListener('input', () => {
-        clearTimeout(markdownTimeout);
-        markdownTimeout = setTimeout(updateMarkdownPreview, 300);
-      });
-    }
+    // Event listeners para o editor Markdown serão inicializados depois com as outras variáveis
 
     // Event listeners para controles de formatação
     ['mdFontFamily', 'mdFontSize', 'mdLineHeight'].forEach(id => {
@@ -1604,6 +1595,15 @@ modo_limpeza: ${stats.mode}
     const statMode = $('#statMode');
 
     let lastResult = null;
+
+    // Event listener para o editor Markdown (preview em tempo real)
+    if (outputMarkdown) {
+      let markdownTimeout;
+      outputMarkdown.addEventListener('input', () => {
+        clearTimeout(markdownTimeout);
+        markdownTimeout = setTimeout(updateMarkdownPreview, 300);
+      });
+    }
 
     pdfInput.addEventListener('change', () => {
       const file = pdfInput.files?.[0];
