@@ -683,49 +683,7 @@
             </div>
 
             <div class="tab-content" id="tab-markdown">
-              <!-- Controles de Formatação -->
-              <div class="format-controls" id="markdownFormatControls" style="display: none; padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border); gap: 1rem;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                  <div>
-                    <label style="font-size: 0.7rem; margin-bottom: 0.25rem;">FONTE</label>
-                    <select id="mdFontFamily" style="font-size: 0.8rem; padding: 0.5rem;">
-                      <option value="Arial, sans-serif">Arial</option>
-                      <option value="'Times New Roman', serif">Times New Roman</option>
-                      <option value="Calibri, sans-serif">Calibri</option>
-                      <option value="'Century Gothic', sans-serif">Century Gothic</option>
-                      <option value="'Courier New', monospace">Courier New (mono)</option>
-                      <option value="Georgia, serif">Georgia</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size: 0.7rem; margin-bottom: 0.25rem;">TAMANHO</label>
-                    <select id="mdFontSize" style="font-size: 0.8rem; padding: 0.5rem;">
-                      <option value="10pt">10pt</option>
-                      <option value="11pt">11pt</option>
-                      <option value="12pt" selected>12pt</option>
-                      <option value="13pt">13pt</option>
-                      <option value="14pt">14pt</option>
-                      <option value="16pt">16pt</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size: 0.7rem; margin-bottom: 0.25rem;">ESPAÇAMENTO</label>
-                    <select id="mdLineHeight" style="font-size: 0.8rem; padding: 0.5rem;">
-                      <option value="1.0">1.0 (Simples)</option>
-                      <option value="1.15">1.15</option>
-                      <option value="1.5" selected>1.5</option>
-                      <option value="2.0">2.0 (Duplo)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <!-- Editor e Preview -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; height: calc(100% - 80px); gap: 1px; background: var(--border);">
-                <textarea id="outputMarkdown" placeholder="A versão em Markdown aparecerá aqui..." style="border: none; border-radius: 0;"></textarea>
-                <div id="markdownPreview" style="padding: 1.5rem; background: white; overflow-y: auto; border: none; font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;">
-                  <div style="color: var(--text-muted); text-align: center; padding: 3rem;">Preview do Markdown aparecerá aqui...</div>
-                </div>
-              </div>
+              <textarea id="outputMarkdown" placeholder="A versão em Markdown aparecerá aqui..."></textarea>
             </div>
 
             <div class="tab-content" id="tab-html">
@@ -749,8 +707,6 @@
     }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <!-- Marked.js para renderizar Markdown -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <!-- Carregamento assíncrono da biblioteca docx para exportação DOCX -->
   <script type="module">
@@ -789,73 +745,7 @@
         tab.classList.add('active');
         const tabId = tab.dataset.tab;
         $(`#tab-${tabId}`).classList.add('active');
-
-        // Mostrar controles de formatação apenas na aba Markdown
-        const formatControls = $('#markdownFormatControls');
-        if (tabId === 'markdown' && formatControls) {
-          formatControls.style.display = 'block';
-          // Atualizar preview ao mudar para aba Markdown
-          updateMarkdownPreview();
-        } else if (formatControls) {
-          formatControls.style.display = 'none';
-        }
       });
-    });
-
-    // ===== MARKDOWN EDITOR & PREVIEW =====
-    function updateMarkdownPreview() {
-      const markdownText = $('#outputMarkdown')?.value || '';
-      const previewDiv = $('#markdownPreview');
-
-      if (!previewDiv || !markdownText.trim()) {
-        if (previewDiv) {
-          previewDiv.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 3rem;">Preview do Markdown aparecerá aqui...</div>';
-        }
-        return;
-      }
-
-      // Renderizar Markdown usando marked.js
-      try {
-        const html = marked.parse(markdownText);
-        previewDiv.innerHTML = html;
-        // Aplicar configurações de formatação
-        applyFormatSettings();
-      } catch (e) {
-        console.error('Erro ao renderizar Markdown:', e);
-        previewDiv.innerHTML = '<div style="color: red; padding: 1rem;">Erro ao renderizar Markdown</div>';
-      }
-    }
-
-    function applyFormatSettings() {
-      const previewDiv = $('#markdownPreview');
-      if (!previewDiv) return;
-
-      const fontFamily = $('#mdFontFamily')?.value || 'Arial, sans-serif';
-      const fontSize = $('#mdFontSize')?.value || '12pt';
-      const lineHeight = $('#mdLineHeight')?.value || '1.5';
-
-      previewDiv.style.fontFamily = fontFamily;
-      previewDiv.style.fontSize = fontSize;
-      previewDiv.style.lineHeight = lineHeight;
-    }
-
-    // Event listeners para o editor Markdown
-    const outputMarkdown = $('#outputMarkdown');
-    if (outputMarkdown) {
-      // Atualizar preview enquanto digita (com debounce)
-      let markdownTimeout;
-      outputMarkdown.addEventListener('input', () => {
-        clearTimeout(markdownTimeout);
-        markdownTimeout = setTimeout(updateMarkdownPreview, 300);
-      });
-    }
-
-    // Event listeners para controles de formatação
-    ['mdFontFamily', 'mdFontSize', 'mdLineHeight'].forEach(id => {
-      const element = $(`#${id}`);
-      if (element) {
-        element.addEventListener('change', applyFormatSettings);
-      }
     });
 
     // ===== PADRÕES POR SISTEMA PROCESSUAL =====
@@ -1486,94 +1376,28 @@ modo_limpeza: ${stats.mode}
         return;
       }
 
-      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = window.docx;
-
-      // Obter configurações de formatação (se disponíveis)
-      const fontFamilyRaw = $('#mdFontFamily')?.value || 'Arial, sans-serif';
-      const fontSizeStr = $('#mdFontSize')?.value || '12pt';
-      const lineHeightStr = $('#mdLineHeight')?.value || '1.5';
-
-      // Converter fonte para nome simples (primeiro nome da lista)
-      const fontFamily = fontFamilyRaw.split(',')[0].replace(/['\"]/g, '').trim();
-
-      // Converter tamanho de pt para half-points (DOCX usa half-points)
-      const fontSize = parseInt(fontSizeStr) * 2; // 12pt = 24 half-points
-
-      // Converter line-height para spacing (240 = single spacing)
-      const lineSpacing = Math.round(parseFloat(lineHeightStr) * 240);
+      const { Document, Packer, Paragraph, TextRun } = window.docx;
 
       const paragraphs = text.split('\n\n').map(p => p.trim()).filter(Boolean);
       const docParagraphs = [];
 
       for (const para of paragraphs) {
-        // Detectar cabeçalhos Markdown
-        const isH1 = para.startsWith('# ');
-        const isH2 = para.startsWith('## ');
-        const isH3 = para.startsWith('### ');
-
-        let cleanPara = para;
-        let heading = null;
-        let isBold = false;
-
-        if (isH1) {
-          cleanPara = para.substring(2);
-          heading = HeadingLevel.HEADING_1;
-          isBold = true;
-        } else if (isH2) {
-          cleanPara = para.substring(3);
-          heading = HeadingLevel.HEADING_2;
-          isBold = true;
-        } else if (isH3) {
-          cleanPara = para.substring(4);
-          heading = HeadingLevel.HEADING_3;
-          isBold = true;
-        }
-
-        // Processar negrito **texto**
-        const parts = cleanPara.split(/(\*\*[^*]+\*\*)/g);
+        const lines = para.split('\n');
         const runs = [];
 
-        for (const part of parts) {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            // Texto em negrito
-            runs.push(new TextRun({
-              text: part.slice(2, -2),
-              font: fontFamily,
-              size: fontSize,
-              bold: true
-            }));
-          } else if (part) {
-            // Texto normal
-            runs.push(new TextRun({
-              text: part,
-              font: fontFamily,
-              size: fontSize,
-              bold: isBold
-            }));
+        for (let i = 0; i < lines.length; i++) {
+          runs.push(new TextRun({ text: lines[i], font: 'Times New Roman', size: 24 }));
+          if (i < lines.length - 1) {
+            runs.push(new TextRun({ text: '\n', font: 'Times New Roman', size: 24 }));
           }
         }
 
-        docParagraphs.push(new Paragraph({
-          children: runs,
-          heading: heading,
-          spacing: { line: lineSpacing }
-        }));
+        docParagraphs.push(new Paragraph({ children: runs }));
       }
 
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: docParagraphs
-        }]
-      });
-
-      try {
-        const blob = await Packer.toBlob(doc);
-        saveAs(blob, filename);
-      } catch (e) {
-        console.error('Erro ao gerar DOCX:', e);
-        showError('Erro ao exportar DOCX: ' + e.message);
-      }
+      const doc = new Document({ sections: [{ children: docParagraphs }] });
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, filename);
     }
 
     // ===== UI =====
