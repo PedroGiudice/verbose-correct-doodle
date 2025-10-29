@@ -720,9 +720,9 @@
                 </div>
               </div>
               <!-- Editor e Preview -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; height: calc(100% - 80px); gap: 1px; background: var(--border);">
-                <textarea id="outputMarkdown" placeholder="A versão em Markdown aparecerá aqui..." style="border: none; border-radius: 0;"></textarea>
-                <div id="markdownPreview" style="padding: 1.5rem; background: white; overflow-y: auto; border: none; font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 400px; gap: 1px; background: var(--border);">
+                <textarea id="outputMarkdown" placeholder="A versão em Markdown aparecerá aqui..." style="border: none; border-radius: 0; min-height: 400px;"></textarea>
+                <div id="markdownPreview" style="padding: 1.5rem; background: white; overflow-y: auto; border: none; font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; min-height: 400px;">
                   <div style="color: var(--text-muted); text-align: center; padding: 3rem;">Preview do Markdown aparecerá aqui...</div>
                 </div>
               </div>
@@ -754,13 +754,15 @@
 
   <!-- Carregamento assíncrono da biblioteca docx para exportação DOCX -->
   <script type="module">
-    try {
-      const docxNS = await import('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js');
-      window.docx = docxNS;
-      console.log('✓ Biblioteca DOCX carregada');
-    } catch (e) {
-      console.warn('⚠ DOCX não disponível:', e);
-    }
+    (async () => {
+      try {
+        const docxNS = await import('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js');
+        window.docx = docxNS;
+        console.log('✓ Biblioteca DOCX carregada');
+      } catch (e) {
+        console.warn('⚠ DOCX não disponível:', e);
+      }
+    })();
   </script>
 
   <script>
@@ -814,15 +816,23 @@
         return;
       }
 
+      // Verificar se marked está disponível
+      if (typeof marked === 'undefined') {
+        previewDiv.innerHTML = '<div style="color: orange; padding: 1rem;">Aguardando carregamento da biblioteca Markdown...</div>';
+        setTimeout(updateMarkdownPreview, 500);
+        return;
+      }
+
       // Renderizar Markdown usando marked.js
       try {
-        const html = marked.parse(markdownText);
+        // Suporte para diferentes versões do marked.js
+        const html = (typeof marked.parse === 'function') ? marked.parse(markdownText) : marked(markdownText);
         previewDiv.innerHTML = html;
         // Aplicar configurações de formatação
         applyFormatSettings();
       } catch (e) {
         console.error('Erro ao renderizar Markdown:', e);
-        previewDiv.innerHTML = '<div style="color: red; padding: 1rem;">Erro ao renderizar Markdown</div>';
+        previewDiv.innerHTML = '<div style="color: red; padding: 1rem;">Erro ao renderizar Markdown: ' + e.message + '</div>';
       }
     }
 
