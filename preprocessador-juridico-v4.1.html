@@ -9,20 +9,20 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #ffffff;
-      --surface: #f8f8f8;
-      --border: #e0e0e0;
-      --text: #1a1a1a;
-      --text-muted: #666666;
-      --accent: #000000;
-      --hover: #f0f0f0;
-      --success: #28a745;
-      --warning: #ffc107;
-      --danger: #dc3545;
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --border: #333333;
+      --text: #ffffff;
+      --text-muted: #999999;
+      --accent: #ffffff;
+      --hover: #1a1a1a;
+      --success: #00ff00;
+      --warning: #ffff00;
+      --danger: #ff0000;
       --mono: 'Courier New', Consolas, Monaco, 'Lucida Console', monospace;
       --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      --radius: 4px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --radius: 0px;
+      --shadow: none;
     }
 
     html, body {
@@ -126,17 +126,20 @@
 
     .quality-badge.auto-accept {
       border-color: var(--success);
-      background: #d4edda;
+      background: #001a00;
+      color: var(--success);
     }
 
     .quality-badge.automated-validation {
       border-color: var(--warning);
-      background: #fff3cd;
+      background: #1a1a00;
+      color: var(--warning);
     }
 
     .quality-badge.human-review {
       border-color: var(--danger);
-      background: #f8d7da;
+      background: #1a0000;
+      color: var(--danger);
     }
 
     .quality-badge .score {
@@ -216,6 +219,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: var(--bg);
+      color: var(--text);
       font-family: var(--mono);
       font-size: 0.85rem;
       transition: border-color 0.2s;
@@ -229,7 +233,8 @@
     select {
       cursor: pointer;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 0.65rem center;
       padding-right: 2rem;
@@ -319,6 +324,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: var(--bg);
+      color: var(--text);
       font-family: var(--mono);
       font-size: 0.85rem;
       line-height: 1.6;
@@ -328,6 +334,10 @@
     textarea:focus {
       outline: none;
       border-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
     }
 
     /* Stats */
@@ -510,20 +520,23 @@
     }
 
     .alert.error {
-      background: var(--accent);
-      color: var(--bg);
+      background: #1a0000;
+      border: 1px solid var(--danger);
+      color: var(--danger);
       display: block;
     }
 
     .alert.info {
       background: var(--surface);
       border: 1px solid var(--border);
+      color: var(--text);
       display: block;
     }
 
     .alert.success {
-      background: var(--success);
-      color: var(--bg);
+      background: #001a00;
+      border: 1px solid var(--success);
+      color: var(--success);
       display: block;
     }
 
@@ -532,7 +545,7 @@
       display: inline-block;
       width: 12px;
       height: 12px;
-      border: 2px solid var(--bg);
+      border: 2px solid var(--text);
       border-radius: 50%;
       border-top-color: transparent;
       animation: spin 0.8s linear infinite;
@@ -554,6 +567,7 @@
       padding: 0.65rem 1rem;
       border: none;
       background: transparent;
+      color: var(--text-muted);
       font-family: var(--mono);
       font-size: 0.75rem;
       font-weight: 700;
@@ -617,6 +631,54 @@
                   Selecionar PDF
                 </label>
                 <input id="pdfFile" type="file" accept="application/pdf,.pdf,.txt" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Processamento em Lote - NOVO v4.1 -->
+        <div class="card">
+          <div class="card-header">[ 01.1 ] Processamento em Lote (v4.1)</div>
+          <div class="card-body">
+            <div class="section">
+              <div class="file-info" id="batchFileInfo">
+                <span class="file-name">Nenhum arquivo selecionado</span>
+              </div>
+              <div class="btn-group">
+                <label class="btn btn-outline" for="pdfBatchFiles">
+                  Selecionar Múltiplos PDFs
+                </label>
+                <input id="pdfBatchFiles" type="file" accept="application/pdf,.pdf" multiple />
+              </div>
+              <div class="checkbox-description" style="margin-top: 0.75rem;">
+                Processar vários PDFs simultaneamente e organizar como autos processuais
+              </div>
+            </div>
+
+            <div class="section" id="batchActions" style="display: none; margin-top: 1rem;">
+              <div class="btn-group" style="width: 100%;">
+                <button class="btn" id="processBatchBtn" style="flex: 1;">
+                  Processar Lote
+                </button>
+              </div>
+            </div>
+
+            <div id="batchProgressContainer" style="display: none; margin-top: 1rem;">
+              <div class="section-title">Progresso do Lote</div>
+              <div id="batchProgressList" style="font-size: 0.75rem; max-height: 200px; overflow-y: auto;">
+                <!-- Lista de progresso dos arquivos -->
+              </div>
+            </div>
+
+            <div class="section" id="batchExportSection" style="display: none; margin-top: 1rem;">
+              <div class="section-title">Exportar Resultado do Lote</div>
+              <div class="btn-group" style="width: 100%;">
+                <button class="btn btn-outline" id="downloadBatchZipBtn" style="flex: 1;">
+                  ZIP (Todos)
+                </button>
+                <button class="btn btn-outline" id="organizeAsAutosBtn" style="flex: 1;">
+                  Organizar Autos
+                </button>
               </div>
             </div>
           </div>
@@ -859,6 +921,7 @@
               <button class="tab active" data-tab="texto">TEXTO LIMPO</button>
               <button class="tab" data-tab="markdown">MARKDOWN</button>
               <button class="tab" data-tab="html">HTML</button>
+              <button class="tab" data-tab="editor">EDITOR (v4.1)</button>
             </div>
 
             <div class="tab-content active" id="tab-texto">
@@ -876,6 +939,24 @@
 
             <div class="tab-content" id="tab-html">
               <textarea id="outputHtml" placeholder="A versão em HTML aparecerá aqui..."></textarea>
+            </div>
+
+            <div class="tab-content" id="tab-editor">
+              <textarea id="editorText" placeholder="EDITOR STANDALONE - Cole ou escreva texto diretamente aqui
+
+> Este editor permite trabalhar com texto sem processar PDFs
+> Cole texto de qualquer fonte ou escreva diretamente
+> Use os botões abaixo para exportar em diferentes formatos"></textarea>
+
+              <div style="margin-top: 1rem;">
+                <div class="section-title">Exportar do Editor</div>
+                <div class="btn-group">
+                  <button class="btn btn-outline" id="editorExportTxt">TXT</button>
+                  <button class="btn btn-outline" id="editorExportMd">MD</button>
+                  <button class="btn btn-outline" id="editorExportDocx">DOCX</button>
+                  <button class="btn btn-outline" id="editorExportHtml">HTML</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -933,6 +1014,9 @@
 
   <!-- Script Principal Enhanced -->
   <script src="modules/main-enhanced.js"></script>
+
+  <!-- Script v4.1 Professional - Extends v4.0 -->
+  <script src="modules/main-v4.1.js"></script>
 
   <!-- Verificação de Módulos v4.1 -->
   <script>
