@@ -3,23 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pré-Processador Jurídico v3.0</title>
+  <title>Pré-Processador Jurídico v4.1 - Professional Edition</title>
   <style>
     /* Reset e Base */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #ffffff;
-      --surface: #f8f8f8;
-      --border: #e0e0e0;
-      --text: #1a1a1a;
-      --text-muted: #666666;
-      --accent: #000000;
-      --hover: #f0f0f0;
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --border: #333333;
+      --text: #ffffff;
+      --text-muted: #999999;
+      --accent: #ffffff;
+      --hover: #1a1a1a;
+      --success: #00ff00;
+      --warning: #ffff00;
+      --danger: #ff0000;
       --mono: 'Courier New', Consolas, Monaco, 'Lucida Console', monospace;
       --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      --radius: 4px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --radius: 0px;
+      --shadow: none;
     }
 
     html, body {
@@ -112,6 +115,92 @@
       color: var(--text-muted);
     }
 
+    /* Quality Badge - NOVO */
+    .quality-badge {
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      border: 2px solid;
+      text-align: center;
+    }
+
+    .quality-badge.auto-accept {
+      border-color: var(--success);
+      background: #001a00;
+      color: var(--success);
+    }
+
+    .quality-badge.automated-validation {
+      border-color: var(--warning);
+      background: #1a1a00;
+      color: var(--warning);
+    }
+
+    .quality-badge.human-review {
+      border-color: var(--danger);
+      background: #1a0000;
+      color: var(--danger);
+    }
+
+    .quality-badge .score {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .quality-badge .status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .quality-details {
+      margin-top: 1rem;
+    }
+
+    .metric {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      gap: 0.75rem;
+    }
+
+    .metric label {
+      min-width: 150px;
+      font-size: 0.7rem;
+      margin: 0;
+    }
+
+    .metric progress {
+      flex: 1;
+      height: 16px;
+      border-radius: 2px;
+    }
+
+    .metric span {
+      min-width: 45px;
+      text-align: right;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    progress {
+      -webkit-appearance: none;
+      appearance: none;
+      border: none;
+    }
+
+    progress::-webkit-progress-bar {
+      background-color: var(--border);
+      border-radius: 2px;
+    }
+
+    progress::-webkit-progress-value {
+      background-color: var(--accent);
+      border-radius: 2px;
+    }
+
     /* Form Elements */
     label {
       display: block;
@@ -130,6 +219,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: var(--bg);
+      color: var(--text);
       font-family: var(--mono);
       font-size: 0.85rem;
       transition: border-color 0.2s;
@@ -143,15 +233,11 @@
     select {
       cursor: pointer;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a1a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      color: var(--text);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 0.65rem center;
       padding-right: 2rem;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
     }
 
     /* Buttons */
@@ -238,6 +324,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: var(--bg);
+      color: var(--text);
       font-family: var(--mono);
       font-size: 0.85rem;
       line-height: 1.6;
@@ -247,6 +334,10 @@
     textarea:focus {
       outline: none;
       border-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
     }
 
     /* Stats */
@@ -369,6 +460,44 @@
       border-color: var(--accent);
     }
 
+    /* Progress Bar - NOVO */
+    .progress-container {
+      margin: 1rem 0;
+      display: none;
+    }
+
+    .progress-container.active {
+      display: block;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 24px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .progress-text {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
     /* Footer */
     footer {
       margin: 3rem 0 2rem 0;
@@ -391,14 +520,23 @@
     }
 
     .alert.error {
-      background: var(--accent);
-      color: var(--bg);
+      background: #1a0000;
+      border: 1px solid var(--danger);
+      color: var(--danger);
       display: block;
     }
 
     .alert.info {
       background: var(--surface);
       border: 1px solid var(--border);
+      color: var(--text);
+      display: block;
+    }
+
+    .alert.success {
+      background: #001a00;
+      border: 1px solid var(--success);
+      color: var(--success);
       display: block;
     }
 
@@ -407,7 +545,7 @@
       display: inline-block;
       width: 12px;
       height: 12px;
-      border: 2px solid var(--bg);
+      border: 2px solid var(--text);
       border-radius: 50%;
       border-top-color: transparent;
       animation: spin 0.8s linear infinite;
@@ -429,6 +567,7 @@
       padding: 0.65rem 1rem;
       border: none;
       background: transparent;
+      color: var(--text-muted);
       font-family: var(--mono);
       font-size: 0.75rem;
       font-weight: 700;
@@ -469,11 +608,12 @@
 <body>
   <div class="container">
     <header>
-      <h1>[ PRÉ-PROCESSADOR JURÍDICO v3.0 ]</h1>
-      <h2>Extração, limpeza e conversão automatizada de documentos processuais para análise por LLMs</h2>
+      <h1>[ PRÉ-PROCESSADOR JURÍDICO v4.1 PROFESSIONAL ]</h1>
+      <h2>Processamento em lote · Organização de autos · Editor Markdown · Análise de peças processuais</h2>
     </header>
 
     <div id="errorBanner" class="alert error"></div>
+    <div id="successBanner" class="alert success"></div>
 
     <div class="grid">
       <!-- Painel Esquerdo -->
@@ -491,6 +631,54 @@
                   Selecionar PDF
                 </label>
                 <input id="pdfFile" type="file" accept="application/pdf,.pdf,.txt" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Processamento em Lote - NOVO v4.1 -->
+        <div class="card">
+          <div class="card-header">[ 01.1 ] Processamento em Lote (v4.1)</div>
+          <div class="card-body">
+            <div class="section">
+              <div class="file-info" id="batchFileInfo">
+                <span class="file-name">Nenhum arquivo selecionado</span>
+              </div>
+              <div class="btn-group">
+                <label class="btn btn-outline" for="pdfBatchFiles">
+                  Selecionar Múltiplos PDFs
+                </label>
+                <input id="pdfBatchFiles" type="file" accept="application/pdf,.pdf" multiple />
+              </div>
+              <div class="checkbox-description" style="margin-top: 0.75rem;">
+                Processar vários PDFs simultaneamente e organizar como autos processuais
+              </div>
+            </div>
+
+            <div class="section" id="batchActions" style="display: none; margin-top: 1rem;">
+              <div class="btn-group" style="width: 100%;">
+                <button class="btn" id="processBatchBtn" style="flex: 1;">
+                  Processar Lote
+                </button>
+              </div>
+            </div>
+
+            <div id="batchProgressContainer" style="display: none; margin-top: 1rem;">
+              <div class="section-title">Progresso do Lote</div>
+              <div id="batchProgressList" style="font-size: 0.75rem; max-height: 200px; overflow-y: auto;">
+                <!-- Lista de progresso dos arquivos -->
+              </div>
+            </div>
+
+            <div class="section" id="batchExportSection" style="display: none; margin-top: 1rem;">
+              <div class="section-title">Exportar Resultado do Lote</div>
+              <div class="btn-group" style="width: 100%;">
+                <button class="btn btn-outline" id="downloadBatchZipBtn" style="flex: 1;">
+                  ZIP (Todos)
+                </button>
+                <button class="btn btn-outline" id="organizeAsAutosBtn" style="flex: 1;">
+                  Organizar Autos
+                </button>
               </div>
             </div>
           </div>
@@ -558,9 +746,16 @@
 
         <!-- Configurações -->
         <div class="card">
-          <div class="card-header">[ 04 ] Configurações de Filtragem</div>
+          <div class="card-header">[ 04 ] Configurações</div>
           <div class="card-body">
             <div class="section">
+              <div class="checkbox">
+                <input type="checkbox" id="enableOCR" checked>
+                <label for="enableOCR">
+                  OCR Automático
+                  <div class="checkbox-description">Detectar e processar PDFs escaneados</div>
+                </label>
+              </div>
               <div class="checkbox">
                 <input type="checkbox" id="rmHash" checked>
                 <label for="rmHash">
@@ -645,8 +840,54 @@
 
       <!-- Painel Direito -->
       <div>
+        <!-- Progress Bar -->
+        <div id="progressContainer" class="progress-container">
+          <div class="card">
+            <div class="card-header">[ PROGRESSO ]</div>
+            <div class="card-body">
+              <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;">
+                  <span id="progressPercent">0%</span>
+                </div>
+              </div>
+              <div class="progress-text" id="progressText">Inicializando...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quality Badge - NOVO -->
+        <div id="qualityBadgeContainer" style="display: none;">
+          <div id="qualityBadge" class="quality-badge">
+            <span class="score" id="qualityScore">-</span>
+            <span class="status" id="qualityStatus">-</span>
+          </div>
+
+          <div class="card">
+            <div class="card-header">[ MÉTRICAS DE QUALIDADE ]</div>
+            <div class="card-body">
+              <div class="quality-details">
+                <div class="metric">
+                  <label>Confiança ML:</label>
+                  <progress id="metricML" value="0" max="1"></progress>
+                  <span id="metricMLValue">-</span>
+                </div>
+                <div class="metric">
+                  <label>Completude Estrutural:</label>
+                  <progress id="metricStructure" value="0" max="1"></progress>
+                  <span id="metricStructureValue">-</span>
+                </div>
+                <div class="metric">
+                  <label>Qualidade do Texto:</label>
+                  <progress id="metricQuality" value="0" max="1"></progress>
+                  <span id="metricQualityValue">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="card">
-          <div class="card-header">[ OUTPUT ] Visualização</div>
+          <div class="card-header">[ ESTATÍSTICAS ]</div>
           <div class="card-body">
             <div id="statsBox" class="stats" style="display: none;">
               <div class="stats-row">
@@ -665,12 +906,22 @@
                 <span class="stats-label">Modo de limpeza:</span>
                 <span class="stats-value" id="statMode">-</span>
               </div>
+              <div class="stats-row">
+                <span class="stats-label">Método de extração:</span>
+                <span class="stats-value" id="statMethod">-</span>
+              </div>
             </div>
+          </div>
+        </div>
 
+        <div class="card">
+          <div class="card-header">[ OUTPUT ] Visualização</div>
+          <div class="card-body">
             <div class="tabs">
               <button class="tab active" data-tab="texto">TEXTO LIMPO</button>
               <button class="tab" data-tab="markdown">MARKDOWN</button>
               <button class="tab" data-tab="html">HTML</button>
+              <button class="tab" data-tab="editor">EDITOR (v4.1)</button>
             </div>
 
             <div class="tab-content active" id="tab-texto">
@@ -689,17 +940,35 @@
             <div class="tab-content" id="tab-html">
               <textarea id="outputHtml" placeholder="A versão em HTML aparecerá aqui..."></textarea>
             </div>
+
+            <div class="tab-content" id="tab-editor">
+              <textarea id="editorText" placeholder="EDITOR STANDALONE - Cole ou escreva texto diretamente aqui
+
+> Este editor permite trabalhar com texto sem processar PDFs
+> Cole texto de qualquer fonte ou escreva diretamente
+> Use os botões abaixo para exportar em diferentes formatos"></textarea>
+
+              <div style="margin-top: 1rem;">
+                <div class="section-title">Exportar do Editor</div>
+                <div class="btn-group">
+                  <button class="btn btn-outline" id="editorExportTxt">TXT</button>
+                  <button class="btn btn-outline" id="editorExportMd">MD</button>
+                  <button class="btn btn-outline" id="editorExportDocx">DOCX</button>
+                  <button class="btn btn-outline" id="editorExportHtml">HTML</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <footer>
-      Pré-Processador Jurídico v3.0 — 100% Offline · Open Source · Otimizado para LLMs
+      Pré-Processador Jurídico v4.1 Professional — Processamento em Lote · Organização de Autos · Editor Markdown · 100% Offline
     </footer>
   </div>
 
-  <!-- Bibliotecas (CDN para versão web) -->
+  <!-- Bibliotecas Externas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
   <script>
     if (window['pdfjsLib']) {
@@ -708,7 +977,20 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-  <!-- Carregamento assíncrono da biblioteca docx para exportação DOCX -->
+  <!-- Tesseract.js para OCR -->
+  <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
+
+  <!-- JSZip para exportação em lote (v4.1) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    if (typeof JSZip !== 'undefined') {
+      console.log('✓ JSZip carregado - Export em lote disponível');
+    } else {
+      console.warn('⚠ JSZip não disponível - Export em lote desabilitado');
+    }
+  </script>
+
+  <!-- Biblioteca DOCX (carregamento assíncrono) -->
   <script type="module">
     try {
       const docxNS = await import('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js');
@@ -719,809 +1001,59 @@
     }
   </script>
 
+  <!-- Carregar Módulos Enhanced v4.0 -->
+  <script src="modules/pdf-structural-parser.js"></script>
+  <script src="modules/quality-metrics.js"></script>
+  <script src="modules/reading-order.js"></script>
+  <script src="modules/ocr-engine.js"></script>
+
+  <!-- Carregar Módulos v4.1 - Novas Funcionalidades -->
+  <script src="modules/legal-document-analyzer.js"></script>
+  <script src="modules/process-file-organizer.js"></script>
+  <script src="modules/batch-processor.js"></script>
+
+  <!-- Script Principal Enhanced -->
+  <script src="modules/main-enhanced.js"></script>
+
+  <!-- Script v4.1 Professional - Extends v4.0 -->
+  <script src="modules/main-v4.1.js"></script>
+
+  <!-- Verificação de Módulos v4.1 -->
   <script>
-    const $ = s => document.querySelector(s);
-    const $$ = s => document.querySelectorAll(s);
-    const errorBanner = $('#errorBanner');
+    (function() {
+      console.log('\n=== VERIFICAÇÃO DE MÓDULOS v4.1 ===');
 
-    function showError(msg) {
-      errorBanner.textContent = '[ ERROR ] ' + msg;
-      errorBanner.style.display = 'block';
-      setTimeout(() => hideError(), 5000);
-    }
+      const modules = {
+        'PDF.js': typeof pdfjsLib !== 'undefined',
+        'FileSaver.js': typeof saveAs !== 'undefined',
+        'Tesseract.js': typeof Tesseract !== 'undefined',
+        'JSZip': typeof JSZip !== 'undefined',
+        'docx.js': typeof window.docx !== 'undefined',
+        'PDFStructuralParser': typeof PDFStructuralParser !== 'undefined',
+        'QualityMetrics': typeof QualityMetrics !== 'undefined',
+        'ReadingOrderDetector': typeof ReadingOrderDetector !== 'undefined',
+        'OCREngine': typeof OCREngine !== 'undefined',
+        'LegalDocumentAnalyzer': typeof LegalDocumentAnalyzer !== 'undefined',
+        'ProcessFileOrganizer': typeof ProcessFileOrganizer !== 'undefined',
+        'BatchProcessor': typeof BatchProcessor !== 'undefined'
+      };
 
-    function hideError() {
-      errorBanner.style.display = 'none';
-    }
-
-    // ===== TABS =====
-    $$('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        // Remove active de todas as tabs
-        $$('.tab').forEach(t => t.classList.remove('active'));
-        $$('.tab-content').forEach(c => c.classList.remove('active'));
-
-        // Ativa tab clicada
-        tab.classList.add('active');
-        const tabId = tab.dataset.tab;
-        $(`#tab-${tabId}`).classList.add('active');
-      });
-    });
-
-    // ===== PADRÕES POR SISTEMA PROCESSUAL =====
-    const SYSTEM_PATTERNS = {
-      eproc: {
-        name: 'E-PROC (TRF)',
-        signatures: [
-          /\bAssinado eletronicamente por[^\n]{0,100}\bem\s+\d{2}\/\d{2}\/\d{4}/gi,
-          /\be-Proc\b/gi,
-          /\bTribunal Regional Federal/gi,
-          /\bVerifique a assinatura digital em[^\n]{0,150}/gi,
-        ]
-      },
-      esaj: {
-        name: 'E-SAJ (TJSP)',
-        signatures: [
-          /\bE-SAJ\b/gi,
-          /\bTribunal de Justi[çc]a do Estado de S[ãa]o Paulo/gi,
-          /\bForo (?:Central|Regional)[^\n]{0,100}/gi,
-          /\bAssinado digitalmente[^\n]{0,100}e-SAJ/gi,
-          /\bC[óo]digo para valida[çc][ãa]o[:\s]*[A-Z0-9]{10,}/gi,
-        ]
-      },
-      pje: {
-        name: 'PJE (CNJ)',
-        signatures: [
-          /\bPJe\b/gi,
-          /\bProcesso Judicial Eletr[ôo]nico/gi,
-          /\bAssinado eletronicamente por[^\n]{0,100}PJe/gi,
-          /\bC[óo]digo Verificador[:\s]*[A-Z0-9]{8,}/gi,
-          /\bAssinatura digital conforme[^\n]{0,100}PJe/gi,
-        ]
-      },
-      projudi: {
-        name: 'PROJUDI',
-        signatures: [
-          /\bPROJUDI\b/gi,
-          /\bSistema de Processo Judicial Digital/gi,
-          /\bAssinado digitalmente[^\n]{0,100}PROJUDI/gi,
-        ]
-      },
-      stf: {
-        name: 'STF',
-        signatures: [
-          /\bSupremo Tribunal Federal\b/gi,
-          /\bSTF\b/g,
-          /\bPra[çc]a dos Tr[êe]s Poderes/gi,
-          /\bAssinado digitalmente[^\n]{0,100}STF/gi,
-        ]
-      },
-      stj: {
-        name: 'STJ',
-        signatures: [
-          /\bSuperior Tribunal de Justi[çc]a\b/gi,
-          /\bSTJ\b/g,
-          /\bAssinado digitalmente[^\n]{0,100}STJ/gi,
-        ]
-      }
-    };
-
-    // ===== REGEX UNIVERSAIS =====
-    const RE = {
-      // Hashes
-      hexId: /\b(?:[A-Fa-f0-9]{32,64})\b/g,
-      sha: /\bSHA[- ]?(?:1|224|256|384|512):?\s*[A-Fa-f0-9]{16,}\b/gi,
-      md5: /\bMD5:?[\s-]*[A-Fa-f0-9]{16,}\b/gi,
-
-      // Protocolos
-      protocolo: /\b(Protocolo|ID|Documento|Validador|Autenticidade|C[óo]digo Verificador|C[óo]digo de Verifica[çc][ãa]o)[:\s#-]*[A-Za-z0-9\-\.\/]{6,}\b/gi,
-
-      // Assinaturas digitais ICP-Brasil
-      icpBrasil: /\b(?:ICP-?Brasil|AC-?[A-Z]{2,}|Autoridade Certificadora|Certificado Digital|Cadeia de certifica[çc][ãa]o)\b/gi,
-      assinaturaEletronica: /\b(?:Assinado (?:eletronicamente|digitalmente)|Documento assinado (?:eletronicamente|digitalmente)|Assinatura eletr[ôo]nica|Assinatura digital)\b/gi,
-      carimboTempo: /\b(?:Carimbo de tempo|Timestamp|Data\/Hora da assinatura|Assinado em \d{2}\/\d{2}\/\d{4})\b/gi,
-      hashAssinatura: /\b(?:Hash do documento|Resumo criptogr[áa]fico|MessageDigest)\s*[:=]?\s*[A-Fa-f0-9]{32,}\b/gi,
-      certificadoSerial: /\b(?:N[úu]mero de s[ée]rie|Serial Number|N[úu]mero do certificado)[:\s]*[A-Fa-f0-9:]{16,}\b/gi,
-      emissorCertificado: /\b(?:Emissor|Emitido por|Issued by)[:\s]*(?:AC|CN=|O=)[^\n]{5,50}\b/gi,
-      validadeCertificado: /\b(?:V[áa]lido de|V[áa]lido at[ée]|Validade)[:\s]*\d{2}\/\d{2}\/\d{4}/gi,
-      selo: /\b(?:Selo|Carimbo|Autenticidade|Valida[çc][ãa]o|Valida\w+)\b/gi,
-
-      // Outros
-      pageNum: /\b(?:p(?:á|a)gina|pag\.?|p\.)\s*\d+(?:\s*de\s*\d+)?\b/gi,
-      oab: /\bOAB(?:\/[A-Z]{2})?\s*[Nn]?[ºo°]?\s*\d{1,6}(?:[-\/][A-Z])?\b/gi,
-      cnpj: /\b\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}\b/g,
-      cep: /\b\d{5}-\d{3}\b/g,
-      phone: /\(\s*\d{2}\s*\)\s*\d{4,5}-\d{4}\b/g,
-      email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
-      url: /\b(?:https?:\/\/|www\.)[^\s]+/gi,
-      addrKw: /\b(?:Rua|Av\.?|Avenida|Alameda|Largo|Pra[çc]a|Rodovia|BR-\d+|SP-\d+|CEP|Sala|Conj\.?|CJ|Edif[íi]cio|Torre)\b/gi,
-      firmKw: /\b(?:Sociedade de Advogados|Escrit[óo]rio de Advocacia|Advogado(?:a)?s?)\b/gi,
-      deferimento: /\b(?:Nestes termos,? pede deferimento|Termos em que,? pede deferimento)\b/gi,
-      assinaturaKw: /\b(?:Assina eletronicamente|Assinatura|Advogado|OAB|Procurador|Defensor)\b/gi
-    };
-
-    function resetRegex() {
-      Object.values(RE).forEach(r => { if (r.global) r.lastIndex = 0; });
-    }
-
-    function norm(s) {
-      return (s || '').replace(/[\t\r]+/g, ' ').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-    }
-
-    function hash(s) {
-      s = norm(s).toLowerCase();
-      let h = 5381;
-      for (let i = 0; i < s.length; i++) {
-        h = ((h << 5) + h) + s.charCodeAt(i);
-      }
-      return (h >>> 0).toString(36);
-    }
-
-    function getSelectedSystem() {
-      const radio = document.querySelector('input[name="system"]:checked');
-      return radio ? radio.value : 'auto';
-    }
-
-    function getSelectedMode() {
-      const radio = document.querySelector('input[name="mode"]:checked');
-      return radio ? radio.value : 'leve';
-    }
-
-    function getWhitelist() {
-      const val = $('#whitelist').value || '';
-      return val.split(',').map(s => s.trim()).filter(Boolean);
-    }
-
-    function detectSystem(text) {
-      const scores = {};
-
-      for (const [key, config] of Object.entries(SYSTEM_PATTERNS)) {
-        let score = 0;
-        for (const pattern of config.signatures) {
-          const matches = text.match(pattern);
-          if (matches) score += matches.length;
+      let allLoaded = true;
+      for (const [name, loaded] of Object.entries(modules)) {
+        const status = loaded ? '✓' : '✗';
+        const level = loaded ? 'log' : 'warn';
+        console[level](`${status} ${name}: ${loaded ? 'CARREGADO' : 'NÃO DISPONÍVEL'}`);
+        if (!loaded && !['JSZip', 'docx.js'].includes(name)) {
+          allLoaded = false;
         }
-        scores[key] = score;
       }
 
-      const detected = Object.entries(scores)
-        .sort((a, b) => b[1] - a[1])
-        .filter(([_, score]) => score > 0)[0];
-
-      return detected ? detected[0] : 'auto';
-    }
-
-    // ===== CLEANER - Versão Integrada =====
-    const Cleaner = {
-      clean(pages, options = {}) {
-        const opts = Object.assign({
-          system: 'auto',
-          mode: 'leve',
-          removeHash: true,
-          removeSignature: true,
-          removeProtocol: true,
-          removePageNum: true,
-          removeHeader: true,
-          normalizeBreaks: true,
-          whitelist: [],
-          topBand: 0.06,
-          bottomBand: 0.10,
-          minRepeat: 2,
-          maxBlockLen: 4,
-          minSignals: 2,
-          pageHeightFallback: 1000
-        }, options);
-
-        // Ajustar parâmetros por modo
-        if (opts.mode === 'leve') {
-          opts.topBand = 0.05;
-          opts.bottomBand = 0.08;
-          opts.minRepeat = 3;
-          opts.minSignals = 3;
-        } else if (opts.mode === 'moderado') {
-          opts.topBand = 0.06;
-          opts.bottomBand = 0.12;
-          opts.minRepeat = 2;
-          opts.minSignals = 2;
-        } else {  // agressivo
-          opts.topBand = 0.08;
-          opts.bottomBand = 0.18;
-          opts.minRepeat = 2;
-          opts.minSignals = 1;
-        }
-
-        const wl = (opts.whitelist || []).map(w => w.trim().toLowerCase()).filter(Boolean);
-        const whitelisted = s => wl.some(w => (s || '').toLowerCase().includes(w));
-        let removed = [];
-
-        const systemPatterns = opts.system !== 'auto' && SYSTEM_PATTERNS[opts.system]
-          ? SYSTEM_PATTERNS[opts.system].signatures
-          : [];
-
-        // Converter páginas em linhas
-        const pagesLines = pages.map(p => ({
-          lines: Array.isArray(p.lines) ? p.lines : []
-        }));
-
-        // FASE 1: Filtrar linhas indesejadas
-        const pages1 = pagesLines.map(pg => ({
-          lines: pg.lines.filter(line => {
-            const t = line.text || '';
-
-            // Whitelist tem prioridade
-            if (whitelisted(t)) return true;
-
-            // Testar padrões específicos do sistema
-            if (opts.removeSignature && systemPatterns.length > 0) {
-              for (const pattern of systemPatterns) {
-                if (pattern.test(t)) {
-                  resetRegex();
-                  removed.push({ text: t, reason: `signature-${opts.system}` });
-                  return false;
-                }
-                resetRegex();
-              }
-            }
-
-            // Hashes
-            if (opts.removeHash && (RE.hexId.test(t) || RE.sha.test(t) || RE.md5.test(t) || RE.hashAssinatura.test(t))) {
-              resetRegex();
-              removed.push({ text: t, reason: 'hash' });
-              return false;
-            }
-            resetRegex();
-
-            // Assinaturas digitais gerais
-            if (opts.removeSignature) {
-              if (RE.icpBrasil.test(t) || RE.assinaturaEletronica.test(t) ||
-                  RE.carimboTempo.test(t) || RE.certificadoSerial.test(t) ||
-                  RE.emissorCertificado.test(t) || RE.validadeCertificado.test(t) || RE.selo.test(t)) {
-                resetRegex();
-                removed.push({ text: t, reason: 'signature-general' });
-                return false;
-              }
-            }
-            resetRegex();
-
-            // Protocolos
-            if (opts.removeProtocol && RE.protocolo.test(t)) {
-              resetRegex();
-              removed.push({ text: t, reason: 'protocol' });
-              return false;
-            }
-            resetRegex();
-
-            // Paginação
-            if (opts.removePageNum && RE.pageNum.test(t)) {
-              resetRegex();
-              removed.push({ text: t, reason: 'page-number' });
-              return false;
-            }
-            resetRegex();
-
-            return true;
-          })
-        }));
-
-        // FASE 2: Detecção de cabeçalho/rodapé repetitivo
-        function isTopBottom(line, idx, total) {
-          const y = (typeof line.y === 'number') ? line.y : null;
-          const ph = (typeof line.pageHeight === 'number' && line.pageHeight > 0) ? line.pageHeight : opts.pageHeightFallback;
-          let inTop = false, inBottom = false;
-
-          if (y !== null) {
-            const rel = y / ph;
-            inTop = (rel <= opts.topBand) || (1 - rel <= opts.topBand);
-            inBottom = (rel >= 1 - opts.bottomBand) || (1 - rel >= 1 - opts.bottomBand);
-          } else {
-            inTop = (idx < Math.max(2, Math.ceil(total * opts.topBand)));
-            inBottom = (idx >= total - Math.max(2, Math.ceil(total * opts.bottomBand)));
-          }
-          return { inTop, inBottom };
-        }
-
-        function countSignals(s) {
-          let c = 0;
-          if (RE.oab.test(s)) c++;
-          if (RE.cnpj.test(s)) c++;
-          if (RE.cep.test(s)) c++;
-          if (RE.phone.test(s)) c++;
-          if (RE.email.test(s)) c++;
-          if (RE.url.test(s)) c++;
-          if (RE.addrKw.test(s)) c++;
-          if (RE.firmKw.test(s)) c++;
-          resetRegex();
-          return c;
-        }
-
-        const blocks = new Map(), samples = new Map();
-        const candidates = pages1.map(pg => {
-          const hits = [];
-          const tot = pg.lines.length;
-          for (let i = 0; i < tot; i++) {
-            const ln = pg.lines[i];
-            const txt = ln.text || '';
-            const pos = isTopBottom(ln, i, tot);
-            const sigs = countSignals(txt);
-            const pageNumMatch = RE.pageNum.test(txt);
-            resetRegex();
-            const likely = (pos.inTop || pos.inBottom) && (sigs >= opts.minSignals || pageNumMatch);
-            if (likely) hits.push(i);
-          }
-          return hits;
-        });
-
-        pages1.forEach((pg, idx) => {
-          const idxs = candidates[idx].sort((a, b) => a - b);
-          for (let i = 0; i < idxs.length; i++) {
-            for (let len = 1; len <= Math.min(opts.maxBlockLen, idxs.length - i); len++) {
-              const start = idxs[i];
-              const seq = idxs.slice(i, i + len);
-              if (seq[seq.length - 1] - seq[0] !== len - 1) break;
-              const text = pg.lines.slice(start, start + len).map(x => x.text || '').join('\n');
-              const key = pg.lines.slice(start, start + len).map(x => hash(x.text || '')).join('|');
-              const k = `${len}|${key}`;
-              blocks.set(k, (blocks.get(k) || 0) + 1);
-              if (!samples.has(k)) samples.set(k, text);
-            }
-          }
-        });
-
-        const repeated = [];
-        for (const [k, c] of blocks) {
-          if (c >= opts.minRepeat) {
-            const sample = samples.get(k);
-            if (countSignals(sample) >= opts.minSignals) {
-              repeated.push({ key: k, count: c, sample });
-            }
-          }
-        }
-
-        function removeRepeated(pagesLines) {
-          return pagesLines.map((pg, pidx) => {
-            const out = [];
-            for (let i = 0; i < pg.lines.length; i++) {
-              let cut = false;
-              for (const blk of repeated) {
-                const len = parseInt(blk.key.split('|')[0], 10);
-                const slice = pg.lines.slice(i, i + len).map(x => x.text || '').join('\n');
-                if (hash(slice) === hash(blk.sample)) {
-                  removed.push({ p: pidx + 1, i, len, text: slice, reason: 'repeated+signals' });
-                  i += len - 1;
-                  cut = true;
-                  break;
-                }
-              }
-              if (!cut) out.push(pg.lines[i]);
-            }
-            return { lines: out };
-          });
-        }
-
-        const pages2 = opts.removeHeader ? removeRepeated(pages1) : pages1;
-
-        // FASE 3: Detecção de blocos de assinatura válidos (para não remover OAB legítimo)
-        function detectSignatureBlocks(pagesLines) {
-          const allow = [];
-          const lastIdx = pagesLines.length - 1;
-
-          // Última página: permitir área de assinatura
-          if (lastIdx >= 0) {
-            const last = pagesLines[lastIdx];
-            const L = last.lines.length;
-            const start = Math.max(0, L - 12);
-            for (let i = L - 1; i >= start; i--) {
-              const t = (last.lines[i].text || '');
-              if (RE.oab.test(t) || RE.assinaturaKw.test(t)) {
-                allow.push({ p: lastIdx, from: Math.max(0, i - 5), to: Math.min(L, i + 3) });
-                break;
-              }
-              resetRegex();
-            }
-          }
-
-          // Primeiras páginas: permitir área de "pede deferimento"
-          const half = Math.ceil(pagesLines.length / 2);
-          for (let p = 0; p < half; p++) {
-            const pg = pagesLines[p];
-            for (let i = 0; i < pg.lines.length; i++) {
-              const t = (pg.lines[i].text || '');
-              if (RE.deferimento.test(t) || RE.assinaturaKw.test(t)) {
-                allow.push({ p, from: Math.max(0, i - 5), to: Math.min(pg.lines.length, i + 6) });
-                break;
-              }
-              resetRegex();
-            }
-          }
-          return allow;
-        }
-
-        const allow = detectSignatureBlocks(pages2);
-
-        function isAllowed(idx, pIdx) {
-          return allow.some(r => r.p === pIdx && idx >= r.from && idx < r.to);
-        }
-
-        function removeOABOutsideSignature(pagesLines) {
-          return pagesLines.map((pg, pidx) => {
-            const out = [];
-            for (let i = 0; i < pg.lines.length; i++) {
-              const t = pg.lines[i].text || '';
-              const hasOAB = RE.oab.test(t) || /\bAdvogado(?:a)?\b/i.test(t);
-              resetRegex();
-
-              if (hasOAB && !isAllowed(i, pidx)) {
-                removed.push({ p: pidx + 1, i, len: 1, text: t, reason: 'oab-outside-signature' });
-                continue;
-              }
-              out.push(pg.lines[i]);
-            }
-            return { lines: out };
-          });
-        }
-
-        const pages3 = removeOABOutsideSignature(pages2);
-
-        // FASE 4: Normalização de quebras
-        const pages4 = opts.normalizeBreaks ?
-          pages3.map(pg => ({
-            lines: pg.lines.map(l => ({
-              ...l,
-              text: (l.text || '')
-                .replace(/[\u00AD]/g, '')  // soft hyphen
-                .replace(/\s+\n/g, '\n')
-            }))
-          })) : pages3;
-
-        const stats = {
-          pages: pages.length,
-          removed: removed.length,
-          allowRanges: allow.length
-        };
-
-        return { pages: pages4, removedBlocks: removed, stats };
-      },
-
-      // Junção com preservação de parágrafos
-      joinPages(pagesLines) {
-        const paragraphs = [];
-
-        for (const page of pagesLines || []) {
-          let currentParagraph = [];
-
-          for (let i = 0; i < page.lines.length; i++) {
-            const line = page.lines[i];
-            const text = (line.text || '').trim();
-
-            if (!text) {
-              // Linha vazia = quebra de parágrafo
-              if (currentParagraph.length > 0) {
-                paragraphs.push(currentParagraph.join(' '));
-                currentParagraph = [];
-              }
-              continue;
-            }
-
-            // Detectar início de novo parágrafo
-            const isNewParagraph =
-              /^\s{2,}/.test(line.text || '') ||  // recuo
-              /^[0-9]+\./.test(text) ||            // numeração
-              /^[A-Z][).]/.test(text) ||           // letras
-              /^[IVX]+\./.test(text) ||            // romanos
-              /^[-•*]/.test(text);                 // bullets
-
-            if (isNewParagraph && currentParagraph.length > 0) {
-              paragraphs.push(currentParagraph.join(' '));
-              currentParagraph = [];
-            }
-
-            currentParagraph.push(text);
-          }
-
-          // Finalizar parágrafo ao fim da página
-          if (currentParagraph.length > 0) {
-            paragraphs.push(currentParagraph.join(' '));
-            currentParagraph = [];
-          }
-        }
-
-        return paragraphs.join('\n\n');
-      }
-    };
-
-    // ===== CONVERSOR PARA MARKDOWN =====
-    const MarkdownConverter = {
-      convert(text) {
-        let md = text;
-
-        // Detectar e formatar títulos (linhas em caixa alta no início de parágrafo)
-        md = md.replace(/^([A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ][A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s]{5,})$/gm, '## $1');
-
-        // Detectar numeração de seções
-        md = md.replace(/^(\d+\.\s+[A-Z][^\n]+)$/gm, '### $1');
-
-        // Detectar listas com bullets
-        md = md.replace(/^([-•*]\s+)/gm, '- ');
-
-        // Detectar listas numeradas já existentes
-        md = md.replace(/^(\d+\.)\s+/gm, '$1 ');
-
-        // Detectar citações (parágrafos começando com aspas)
-        md = md.replace(/^"([^\n]+)"$/gm, '> "$1"');
-
-        // Adicionar quebras de linha para melhor formatação
-        md = md.replace(/\n{3,}/g, '\n\n');
-
-        return md;
-      },
-
-      addMetadata(md, stats) {
-        const metadata = `---
-título: Documento Jurídico Processado
-data_processamento: ${new Date().toISOString().split('T')[0]}
-páginas: ${stats.pages}
-sistema: ${stats.system}
-modo_limpeza: ${stats.mode}
----
-
-`;
-        return metadata + md;
-      }
-    };
-
-    // ===== CONVERSOR PARA HTML =====
-    const HtmlConverter = {
-      convert(text) {
-        let html = '<!DOCTYPE html>\n<html lang="pt-br">\n<head>\n';
-        html += '  <meta charset="UTF-8">\n';
-        html += '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
-        html += '  <title>Documento Jurídico</title>\n';
-        html += '  <style>\n';
-        html += '    body { font-family: "Times New Roman", serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.8; }\n';
-        html += '    h1 { font-size: 24px; text-align: center; margin-bottom: 30px; }\n';
-        html += '    h2 { font-size: 18px; margin-top: 30px; margin-bottom: 15px; }\n';
-        html += '    h3 { font-size: 16px; margin-top: 20px; margin-bottom: 10px; }\n';
-        html += '    p { text-align: justify; margin-bottom: 15px; text-indent: 2em; }\n';
-        html += '    ul, ol { margin: 15px 0; padding-left: 40px; }\n';
-        html += '    li { margin-bottom: 8px; }\n';
-        html += '    blockquote { border-left: 3px solid #ccc; padding-left: 20px; margin: 20px 0; font-style: italic; }\n';
-        html += '  </style>\n';
-        html += '</head>\n<body>\n';
-        html += '  <h1>Documento Jurídico</h1>\n';
-
-        // Processar parágrafos
-        const paragraphs = text.split('\n\n');
-        for (const para of paragraphs) {
-          const trimmed = para.trim();
-          if (!trimmed) continue;
-
-          // Título (caixa alta)
-          if (/^[A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ][A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s]{5,}$/.test(trimmed)) {
-            html += `  <h2>${trimmed}</h2>\n`;
-          }
-          // Seção numerada
-          else if (/^\d+\.\s+[A-Z]/.test(trimmed)) {
-            html += `  <h3>${trimmed}</h3>\n`;
-          }
-          // Lista com bullets
-          else if (/^[-•*]\s+/.test(trimmed)) {
-            html += '  <ul>\n';
-            const items = trimmed.split('\n');
-            for (const item of items) {
-              const cleaned = item.replace(/^[-•*]\s+/, '');
-              html += `    <li>${cleaned}</li>\n`;
-            }
-            html += '  </ul>\n';
-          }
-          // Citação
-          else if (/^".*"$/.test(trimmed)) {
-            html += `  <blockquote>${trimmed}</blockquote>\n`;
-          }
-          // Parágrafo normal
-          else {
-            html += `  <p>${trimmed}</p>\n`;
-          }
-        }
-
-        html += '</body>\n</html>';
-        return html;
-      }
-    };
-
-    // ===== EXTRAÇÃO PDF =====
-    async function extractFromPDF(file) {
-      if (!window['pdfjsLib']) throw new Error('PDF.js não carregado');
-
-      const pdfjsLib = window['pdfjsLib'];
-      const buf = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      const pages = [];
-
-      for (let p = 1; p <= pdf.numPages; p++) {
-        const page = await pdf.getPage(p);
-        const viewport = page.getViewport({ scale: 1 });
-        const txt = await page.getTextContent();
-        const items = txt.items || [];
-
-        const linesMap = new Map();
-        for (const it of items) {
-          const s = it.str || '';
-          const tr = it.transform || [1, 0, 0, 1, 0, 0];
-          const x = tr[4], y = tr[5];
-          const key = Math.round(y);
-
-          if (!linesMap.has(key)) linesMap.set(key, []);
-          linesMap.get(key).push({ text: s, x, y, pageHeight: viewport.height });
-        }
-
-        const lineKeys = Array.from(linesMap.keys()).sort((a, b) => b - a);
-        const lines = [];
-
-        for (const k of lineKeys) {
-          const arr = linesMap.get(k).sort((a, b) => a.x - b.x);
-          const text = arr.map(o => o.text).join(' ');
-          lines.push({ text, y: arr[0].y, x: arr[0].x, pageHeight: viewport.height });
-        }
-
-        pages.push({ lines });
-      }
-
-      return pages;
-    }
-
-    // ===== EXPORTAÇÃO DOCX =====
-    async function exportToDocx(text, filename) {
-      if (!window.docx) {
-        showError('Biblioteca DOCX não disponível. Recarregue a página.');
-        return;
-      }
-
-      const { Document, Packer, Paragraph, TextRun } = window.docx;
-
-      const paragraphs = text.split('\n\n').map(p => p.trim()).filter(Boolean);
-      const docParagraphs = [];
-
-      for (const para of paragraphs) {
-        const lines = para.split('\n');
-        const runs = [];
-
-        for (let i = 0; i < lines.length; i++) {
-          runs.push(new TextRun({ text: lines[i], font: 'Times New Roman', size: 24 }));
-          if (i < lines.length - 1) {
-            runs.push(new TextRun({ text: '\n', font: 'Times New Roman', size: 24 }));
-          }
-        }
-
-        docParagraphs.push(new Paragraph({ children: runs }));
-      }
-
-      const doc = new Document({ sections: [{ children: docParagraphs }] });
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, filename);
-    }
-
-    // ===== UI =====
-    const pdfInput = $('#pdfFile');
-    const fileInfo = $('#fileInfo');
-    const processBtn = $('#processBtn');
-    const downloadTxtBtn = $('#downloadTxtBtn');
-    const downloadMdBtn = $('#downloadMdBtn');
-    const downloadDocxBtn = $('#downloadDocxBtn');
-    const downloadHtmlBtn = $('#downloadHtmlBtn');
-    const outputText = $('#outputText');
-    const outputMarkdown = $('#outputMarkdown');
-    const outputHtml = $('#outputHtml');
-    const statsBox = $('#statsBox');
-    const statPages = $('#statPages');
-    const statRemoved = $('#statRemoved');
-    const statSystem = $('#statSystem');
-    const statMode = $('#statMode');
-
-    let lastResult = null;
-
-    pdfInput.addEventListener('change', () => {
-      const file = pdfInput.files?.[0];
-      if (file) {
-        fileInfo.innerHTML = `<span class="file-name">${file.name}</span> (${(file.size / 1024).toFixed(1)} KB)`;
-      } else {
-        fileInfo.innerHTML = `<span class="file-name">Nenhum arquivo selecionado</span>`;
-      }
-      hideError();
-    });
-
-    processBtn.addEventListener('click', async () => {
-      const file = pdfInput.files?.[0];
-      if (!file) {
-        showError('Selecione um arquivo PDF');
-        return;
-      }
-
-      processBtn.disabled = true;
-      processBtn.innerHTML = '<span class="loading"></span> Processando...';
-      hideError();
-
-      try {
-        const pages = await extractFromPDF(file);
-        const fullText = pages.map(p => p.lines.map(l => l.text).join('\n')).join('\n\n');
-
-        let selectedSystem = getSelectedSystem();
-        if (selectedSystem === 'auto') {
-          selectedSystem = detectSystem(fullText);
-        }
-
-        const selectedMode = getSelectedMode();
-
-        const result = Cleaner.clean(pages, {
-          system: selectedSystem,
-          mode: selectedMode,
-          removeHash: $('#rmHash').checked,
-          removeSignature: $('#rmAssinatura').checked,
-          removeProtocol: $('#rmProtocolo').checked,
-          removePageNum: $('#rmPageNum').checked,
-          removeHeader: $('#rmHeader').checked,
-          normalizeBreaks: $('#normalizeBreaks').checked,
-          whitelist: getWhitelist()
-        });
-
-        const cleanText = Cleaner.joinPages(result.pages);
-        const markdown = MarkdownConverter.addMetadata(
-          MarkdownConverter.convert(cleanText),
-          {
-            ...result.stats,
-            system: SYSTEM_PATTERNS[selectedSystem]?.name || selectedSystem.toUpperCase(),
-            mode: selectedMode.toUpperCase()
-          }
-        );
-        const html = HtmlConverter.convert(cleanText);
-
-        outputText.value = cleanText;
-        outputMarkdown.value = markdown;
-        outputHtml.value = html;
-
-        lastResult = { cleanText, markdown, html, stats: result.stats, system: selectedSystem, mode: selectedMode };
-
-        statPages.textContent = result.stats.pages;
-        statRemoved.textContent = result.stats.removed;
-        statSystem.textContent = SYSTEM_PATTERNS[selectedSystem]?.name || selectedSystem.toUpperCase();
-        statMode.textContent = selectedMode.toUpperCase();
-        statsBox.style.display = 'block';
-
-        downloadTxtBtn.disabled = false;
-        downloadMdBtn.disabled = false;
-        downloadDocxBtn.disabled = false;
-        downloadHtmlBtn.disabled = false;
-
-      } catch (err) {
-        console.error(err);
-        showError('Falha ao processar PDF. Verifique se o arquivo é válido.');
-      } finally {
-        processBtn.disabled = false;
-        processBtn.textContent = 'Processar';
-      }
-    });
-
-    downloadTxtBtn.addEventListener('click', () => {
-      if (!lastResult) return;
-      const blob = new Blob([lastResult.cleanText], { type: 'text/plain;charset=utf-8' });
-      saveAs(blob, 'documento_processado.txt');
-    });
-
-    downloadMdBtn.addEventListener('click', () => {
-      if (!lastResult) return;
-      const blob = new Blob([lastResult.markdown], { type: 'text/markdown;charset=utf-8' });
-      saveAs(blob, 'documento_processado.md');
-    });
-
-    downloadDocxBtn.addEventListener('click', async () => {
-      if (!lastResult) return;
-      await exportToDocx(lastResult.cleanText, 'documento_processado.docx');
-    });
-
-    downloadHtmlBtn.addEventListener('click', () => {
-      if (!lastResult) return;
-      const blob = new Blob([lastResult.html], { type: 'text/html;charset=utf-8' });
-      saveAs(blob, 'documento_processado.html');
-    });
+      console.log(`\nStatus: ${allLoaded ? '✅ TODOS MÓDULOS ESSENCIAIS CARREGADOS' : '⚠️ ALGUNS MÓDULOS FALTANDO'}`);
+      console.log('=====================================\n');
+
+      // Disponibilizar globalmente para debug
+      window.__moduleStatus = modules;
+    })();
   </script>
 </body>
 </html>
