@@ -20,18 +20,98 @@
   const modules = {
     legalAnalyzer: typeof LegalDocumentAnalyzer !== 'undefined' ? new LegalDocumentAnalyzer() : null,
     processOrganizer: typeof ProcessFileOrganizer !== 'undefined' ? new ProcessFileOrganizer() : null,
-    batchProcessor: typeof BatchProcessor !== 'undefined' ? new BatchProcessor() : null
+    batchProcessor: typeof BatchProcessor !== 'undefined' ? new BatchProcessor() : null,
+    systemDetector: typeof JudicialSystemDetector !== 'undefined' ? new JudicialSystemDetector() : null,
+    advancedCleaner: typeof AdvancedSignatureCleaner !== 'undefined' ? new AdvancedSignatureCleaner() : null
   };
 
   if (!modules.legalAnalyzer || !modules.processOrganizer || !modules.batchProcessor) {
     console.warn('[Main v4.1] Alguns módulos v4.1 não disponíveis. Funcionalidades limitadas.');
   }
 
+  if (modules.systemDetector) {
+    console.log('[Main v4.1] ✓ Detecção de sistema judicial habilitada');
+  }
+
+  if (modules.advancedCleaner) {
+    console.log('[Main v4.1] ✓ Limpeza avançada de assinaturas habilitada');
+  }
+
+  // ===== HELPER FUNCTIONS =====
+
+  /**
+   * Lê blacklist do campo de texto (v4.1)
+   * @returns {array} Array de strings a serem removidas
+   */
+  function getBlacklist() {
+    const blacklistField = $('#blacklist');
+    if (!blacklistField || !blacklistField.value) {
+      return [];
+    }
+
+    // Dividir por linhas, remover vazias e trim
+    return blacklistField.value
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+  }
+
+  /**
+   * Detecta sistema judicial usando novo módulo (v4.1)
+   * @param {string} text - Texto extraído do PDF
+   * @returns {string} Código do sistema (PJE, ESAJ, STF, etc)
+   */
+  function detectSystemEnhanced(text) {
+    if (!modules.systemDetector) {
+      // Fallback para detecção antiga (main-enhanced.js)
+      return detectSystem(text);
+    }
+
+    const detection = modules.systemDetector.detectSystem(text);
+    console.log(`[Main v4.1] Sistema detectado: ${detection.name} (${detection.confidence}% confiança)`);
+
+    return detection.system;
+  }
+
+  /**
+   * Aplica limpeza avançada de assinaturas (v4.1)
+   * @param {string} text - Texto pré-limpo
+   * @param {string} detectedSystem - Sistema detectado
+   * @returns {string} Texto com assinaturas removidas
+   */
+  function applyAdvancedCleaning(text, detectedSystem) {
+    if (!modules.advancedCleaner) {
+      return text;
+    }
+
+    // Atualizar blacklist no cleaner
+    const blacklist = getBlacklist();
+    modules.advancedCleaner.setCustomBlacklist(blacklist);
+
+    // Aplicar limpeza específica do sistema
+    updateProgress(88, 'Removendo assinaturas e selos...');
+    const cleanResult = modules.advancedCleaner.clean(text, detectedSystem);
+
+    // Log estatísticas
+    console.log(`[Main v4.1] Limpeza avançada concluída:`);
+    console.log(`  - Texto original: ${cleanResult.stats.originalLength} chars`);
+    console.log(`  - Texto final: ${cleanResult.stats.finalLength} chars`);
+    console.log(`  - Redução: ${cleanResult.stats.reductionPercentage}%`);
+    console.log(`  - Padrões removidos: ${cleanResult.stats.removedPatterns.length}`);
+
+    if (cleanResult.stats.removedPatterns.length > 0) {
+      console.log('  - Categorias:', [...new Set(cleanResult.stats.removedPatterns.map(p => p.category))]);
+    }
+
+    return cleanResult.text;
+  }
+
   // ===== STATE MANAGEMENT =====
   const state = {
     batchResults: [],
     currentBatchFile: null,
-    documentAnalysis: null
+    documentAnalysis: null,
+    detectedSystem: null // v4.1: armazena sistema detectado
   };
 
   // ===== EXTEND PROCESSING PIPELINE =====
@@ -70,13 +150,16 @@
 
         const fullText = pages.map(p => p.lines.map(l => l.text).join('\n')).join('\n\n');
 
+        // ===== v4.1: DETECÇÃO APRIMORADA DE SISTEMA =====
         let selectedSystem = getSelectedSystem();
         if (selectedSystem === 'auto') {
-          selectedSystem = detectSystem(fullText);
+          selectedSystem = detectSystemEnhanced(fullText);
+          state.detectedSystem = selectedSystem;
         }
 
         const selectedMode = getSelectedMode();
 
+        // Limpeza básica (v4.0)
         const result = Cleaner.clean(pages, {
           system: selectedSystem,
           mode: selectedMode,
@@ -89,11 +172,16 @@
           whitelist: getWhitelist()
         });
 
-        const cleanText = Cleaner.joinPages(result.pages);
+        let cleanText = Cleaner.joinPages(result.pages);
 
-        // ===== NOVO: ANÁLISE DE DOCUMENTO JURÍDICO =====
+        // ===== v4.1: LIMPEZA AVANÇADA DE ASSINATURAS =====
+        if (modules.advancedCleaner && selectedSystem) {
+          cleanText = applyAdvancedCleaning(cleanText, selectedSystem);
+        }
+
+        // ===== v4.1: ANÁLISE DE DOCUMENTO JURÍDICO =====
         if (modules.legalAnalyzer) {
-          updateProgress(87, 'Analisando tipo de documento jurídico...');
+          updateProgress(90, 'Analisando tipo de documento jurídico...');
 
           state.documentAnalysis = modules.legalAnalyzer.analyzeDocument(cleanText);
           console.log('[Main v4.1] Análise do documento:', state.documentAnalysis);

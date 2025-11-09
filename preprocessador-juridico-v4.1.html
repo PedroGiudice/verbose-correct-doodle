@@ -807,6 +807,12 @@
             </div>
 
             <div class="section" style="margin-top: 1.5rem;">
+              <div class="section-title">Lista negra (sempre remover) - v4.1</div>
+              <textarea id="blacklist" rows="3" placeholder="Assinado digitalmente&#10;Código de verificação&#10;Autentique em:"></textarea>
+              <div class="checkbox-description" style="margin-top: 0.5rem;">Um termo por linha. Textos literais serão removidos.</div>
+            </div>
+
+            <div class="section" style="margin-top: 1.5rem;">
               <div class="btn-group" style="width: 100%;">
                 <button class="btn" id="processBtn" style="flex: 1;">
                   Processar
@@ -1007,7 +1013,11 @@
   <script src="modules/reading-order.js"></script>
   <script src="modules/ocr-engine.js"></script>
 
-  <!-- Carregar Módulos v4.1 - Novas Funcionalidades -->
+  <!-- Carregar Módulos v4.1 - Sistema Judicial e Limpeza Avançada -->
+  <script src="modules/judicial-system-detector.js"></script>
+  <script src="modules/advanced-signature-cleaner.js"></script>
+
+  <!-- Carregar Módulos v4.1 - Análise de Peças e Organização -->
   <script src="modules/legal-document-analyzer.js"></script>
   <script src="modules/process-file-organizer.js"></script>
   <script src="modules/batch-processor.js"></script>
