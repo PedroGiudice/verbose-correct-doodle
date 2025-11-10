@@ -11,7 +11,10 @@
  * - Detecção melhorada de PDFs escaneados (análise de imagens)
  * - Threshold adaptativo
  *
- * @author Pré-Processador Jurídico v4.1
+ * v4.1.2 Hotfix:
+ * - Correção de travamento OCR com caminhos explícitos de CDN (CORS fix)
+ *
+ * @author Pré-Processador Jurídico v4.1.2
  * @license MIT
  */
 
@@ -32,6 +35,24 @@ class OCREngine {
     this.ENABLE_ADVANCED_PREPROCESSING = true;
     this.ENABLE_NOISE_REDUCTION = true;
     this.ENABLE_DESKEW = true; // Correção de inclinação
+
+    // v4.1.2: Timeouts para evitar travamentos
+    this.INIT_TIMEOUT = 45000;      // 45s para inicialização (download do modelo)
+    this.RECOGNIZE_TIMEOUT = 90000; // 90s por página
+    this.RENDER_TIMEOUT = 30000;    // 30s para renderização
+  }
+
+  /**
+   * Helper: Executa promessa com timeout
+   * @private
+   */
+  _withTimeout(promise, timeoutMs, operationName = 'Operação') {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`${operationName} excedeu timeout de ${timeoutMs}ms`)), timeoutMs)
+      )
+    ]);
   }
 
   /**
@@ -54,39 +75,67 @@ class OCREngine {
         }
 
         console.log('[OCREngine] Inicializando Tesseract.js para português...');
+        console.log('[OCREngine] ⏱ Timeout de inicialização: ' + (this.INIT_TIMEOUT / 1000) + 's');
 
-        // Criar worker com idioma português
-        this.tesseract = await Tesseract.createWorker('por', 1, {
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              console.log(`[OCREngine] Progresso: ${Math.round(m.progress * 100)}%`);
+        // Criar worker com idioma português (COM TIMEOUT)
+        // v4.1.2: Caminhos explícitos de CDN para evitar problemas CORS no GitHub Pages
+        this.tesseract = await this._withTimeout(
+          Tesseract.createWorker('por', 1, {
+            workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/worker.min.js',
+            langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+            corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4/tesseract-core.wasm.js',
+            logger: (m) => {
+              if (m.status === 'recognizing text') {
+                console.log(`[OCREngine] Progresso: ${Math.round(m.progress * 100)}%`);
+              } else if (m.status) {
+                console.log(`[OCREngine] ${m.status}...`);
+              }
             }
-          }
-        });
+          }),
+          this.INIT_TIMEOUT,
+          'Inicialização do Tesseract'
+        );
 
-        // Configurar parâmetros otimizados para documentos jurídicos
-        await this.tesseract.setParameters({
-          // Whitelist de caracteres (português + caracteres legais)
-          tessedit_char_whitelist:
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
-            'áàâãéèêíìîóòôõúùûçÁÀÂÃÉÈÊÍÌÎÓÒÔÕÚÙÛÇ' +
-            '0123456789.,;:!?()[]{}§º°ª-_/\\ \n',
+        console.log('[OCREngine] Worker criado, configurando parâmetros...');
 
-          // Preservar espaços entre palavras
-          preserve_interword_spaces: '1',
+        // Configurar parâmetros otimizados para documentos jurídicos (COM TIMEOUT)
+        await this._withTimeout(
+          this.tesseract.setParameters({
+            // Whitelist de caracteres (português + caracteres legais)
+            tessedit_char_whitelist:
+              'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
+              'áàâãéèêíìîóòôõúùûçÁÀÂÃÉÈÊÍÌÎÓÒÔÕÚÙÛÇ' +
+              '0123456789.,;:!?()[]{}§º°ª-_/\\ \n',
 
-          // PSM (Page Segmentation Mode) - 1 = auto with OSD
-          tessedit_pageseg_mode: Tesseract.PSM.AUTO
-        });
+            // Preservar espaços entre palavras
+            preserve_interword_spaces: '1',
+
+            // PSM (Page Segmentation Mode) - 3 = fully automatic (mais estável que AUTO)
+            tessedit_pageseg_mode: Tesseract.PSM.AUTO_ONLY
+          }),
+          5000,
+          'Configuração de parâmetros'
+        );
 
         this.initialized = true;
-        console.log('[OCREngine] ✓ Tesseract inicializado com sucesso');
+        console.log('[OCREngine] ✅ Tesseract inicializado com sucesso');
 
         return true;
       } catch (error) {
-        console.error('[OCREngine] Erro ao inicializar:', error);
+        console.error('[OCREngine] ❌ Erro ao inicializar:', error);
         this.initialized = false;
         this.initPromise = null;
+
+        // Tentar limpar recursos em caso de erro
+        if (this.tesseract) {
+          try {
+            await this.tesseract.terminate();
+          } catch (e) {
+            // Ignora erros de limpeza
+          }
+          this.tesseract = null;
+        }
+
         throw error;
       }
     })();
@@ -189,33 +238,52 @@ class OCREngine {
     console.log(`[OCREngine] Processando páginas ${startPage} a ${endPage}...`);
 
     for (let i = startPage; i <= endPage; i++) {
+      const pageStartTime = Date.now();
+
       try {
-        console.log(`[OCREngine] Processando página ${i}/${endPage}...`);
+        console.log(`[OCREngine] 📄 Processando página ${i}/${endPage}...`);
 
         const page = await pdf.getPage(i);
         const viewport = page.getViewport({ scale: opts.scale });
 
-        // Renderizar página como imagem
+        // Renderizar página como imagem (COM TIMEOUT)
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        await page.render({
-          canvasContext: context,
-          viewport: viewport
-        }).promise;
+        console.log(`[OCREngine] Renderizando página ${i} (${canvas.width}x${canvas.height})...`);
+
+        await this._withTimeout(
+          page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise,
+          this.RENDER_TIMEOUT,
+          `Renderização da página ${i}`
+        );
 
         // Pré-processar imagem para melhor OCR
+        console.log(`[OCREngine] Pré-processando imagem da página ${i}...`);
         const processedCanvas = this.preprocessImage(canvas);
 
-        // Executar OCR
-        const result = await this.tesseract.recognize(processedCanvas);
+        // Executar OCR (COM TIMEOUT - PONTO MAIS CRÍTICO)
+        console.log(`[OCREngine] ⚙️ Executando OCR na página ${i} (timeout: ${this.RECOGNIZE_TIMEOUT / 1000}s)...`);
+
+        const result = await this._withTimeout(
+          this.tesseract.recognize(processedCanvas),
+          this.RECOGNIZE_TIMEOUT,
+          `OCR da página ${i}`
+        );
+
+        const pageTime = ((Date.now() - pageStartTime) / 1000).toFixed(2);
+        console.log(`[OCREngine] ✅ Página ${i} concluída em ${pageTime}s (confiança: ${result.data.confidence.toFixed(1)}%)`);
 
         pages.push({
           pageNumber: i,
           text: result.data.text,
           confidence: result.data.confidence,
+          processingTime: pageTime,
           words: result.data.words.map(w => ({
             text: w.text,
             confidence: w.confidence,
@@ -228,33 +296,60 @@ class OCREngine {
           opts.progressCallback({
             current: i,
             total: endPage,
-            percentage: ((i - startPage + 1) / (endPage - startPage + 1)) * 100
+            percentage: ((i - startPage + 1) / (endPage - startPage + 1)) * 100,
+            pageTime: pageTime
           });
         }
 
         // Limpar canvas
         canvas.remove();
+        processedCanvas.remove();
 
       } catch (error) {
-        console.error(`[OCREngine] Erro na página ${i}:`, error);
+        const pageTime = ((Date.now() - pageStartTime) / 1000).toFixed(2);
+        console.error(`[OCREngine] ❌ Erro na página ${i} após ${pageTime}s:`, error.message);
+
         pages.push({
           pageNumber: i,
           text: '',
           confidence: 0,
-          error: error.message
+          error: error.message,
+          processingTime: pageTime,
+          timeout: error.message.includes('timeout')
         });
+
+        // Não aborta todo o processo - continua com próxima página
       }
     }
 
     // Calcular confiança média
     const avgConfidence = pages.reduce((sum, p) => sum + (p.confidence || 0), 0) / pages.length;
 
-    console.log(`[OCREngine] ✓ OCR concluído. Confiança média: ${avgConfidence.toFixed(2)}%`);
+    // Estatísticas de processamento
+    const successfulPages = pages.filter(p => !p.error).length;
+    const failedPages = pages.filter(p => p.error).length;
+    const timeoutPages = pages.filter(p => p.timeout).length;
+    const totalTime = pages.reduce((sum, p) => sum + (parseFloat(p.processingTime) || 0), 0);
+
+    console.log(`[OCREngine] ✅ OCR concluído:`);
+    console.log(`  - Páginas processadas: ${successfulPages}/${pages.length}`);
+    console.log(`  - Confiança média: ${avgConfidence.toFixed(2)}%`);
+    console.log(`  - Tempo total: ${totalTime.toFixed(2)}s`);
+    if (failedPages > 0) {
+      console.log(`  - ⚠️ Falhas: ${failedPages} página(s)`);
+      if (timeoutPages > 0) {
+        console.log(`  - ⏱️ Timeouts: ${timeoutPages} página(s)`);
+      }
+    }
 
     return {
       pages,
       avgConfidence,
       totalPages: pages.length,
+      successfulPages,
+      failedPages,
+      timeoutPages,
+      totalTime,
       method: 'ocr'
     };
   }
@@ -435,14 +530,48 @@ class OCREngine {
   }
 
   /**
+   * Reinicializa o worker do Tesseract
+   * Útil quando o worker trava ou para em um estado inconsistente
+   * @returns {Promise<boolean>}
+   */
+  async reinitialize() {
+    console.log('[OCREngine] 🔄 Reinicializando worker...');
+
+    try {
+      // Terminar worker atual
+      await this.terminate();
+
+      // Aguardar um pouco antes de reiniciar
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Reinicializar
+      return await this.initialize();
+    } catch (error) {
+      console.error('[OCREngine] ❌ Erro ao reinicializar:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Limpa recursos do Tesseract
    */
   async terminate() {
     if (this.tesseract) {
-      await this.tesseract.terminate();
-      this.tesseract = null;
-      this.initialized = false;
-      console.log('[OCREngine] Recursos liberados');
+      try {
+        console.log('[OCREngine] Liberando recursos do Tesseract...');
+        await this._withTimeout(
+          this.tesseract.terminate(),
+          5000,
+          'Terminação do worker'
+        );
+      } catch (error) {
+        console.warn('[OCREngine] ⚠️ Erro ao terminar worker:', error.message);
+      } finally {
+        this.tesseract = null;
+        this.initialized = false;
+        this.initPromise = null;
+        console.log('[OCREngine] ✅ Recursos liberados');
+      }
     }
   }
 
