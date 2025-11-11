@@ -239,6 +239,8 @@ class OCREngine {
 
     for (let i = startPage; i <= endPage; i++) {
       const pageStartTime = Date.now();
+      let canvas = null; // v4.1.3: Declarar fora do try para cleanup em catch
+      let processedCanvas = null;
 
       try {
         console.log(`[OCREngine] 📄 Processando página ${i}/${endPage}...`);
@@ -247,7 +249,7 @@ class OCREngine {
         const viewport = page.getViewport({ scale: opts.scale });
 
         // Renderizar página como imagem (COM TIMEOUT)
-        const canvas = document.createElement('canvas');
+        canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
@@ -265,7 +267,7 @@ class OCREngine {
 
         // Pré-processar imagem para melhor OCR
         console.log(`[OCREngine] Pré-processando imagem da página ${i}...`);
-        const processedCanvas = this.preprocessImage(canvas);
+        processedCanvas = this.preprocessImage(canvas);
 
         // Executar OCR (COM TIMEOUT - PONTO MAIS CRÍTICO)
         console.log(`[OCREngine] ⚙️ Executando OCR na página ${i} (timeout: ${this.RECOGNIZE_TIMEOUT / 1000}s)...`);
@@ -308,6 +310,14 @@ class OCREngine {
       } catch (error) {
         const pageTime = ((Date.now() - pageStartTime) / 1000).toFixed(2);
         console.error(`[OCREngine] ❌ Erro na página ${i} após ${pageTime}s:`, error.message);
+
+        // v4.1.3: ROBUSTNESS FIX - Limpar canvas em caso de erro
+        try {
+          if (canvas) canvas.remove();
+          if (processedCanvas) processedCanvas.remove();
+        } catch (cleanupError) {
+          console.warn('[OCREngine] ⚠️ Falha ao limpar canvas:', cleanupError.message);
+        }
 
         pages.push({
           pageNumber: i,

@@ -17,6 +17,10 @@ class BatchProcessor {
     this.errors = [];
     this.progressCallback = options.progressCallback || null;
     this.itemCompleteCallback = options.itemCompleteCallback || null;
+
+    // v4.1.3: Timeout global para prevenir loops infinitos
+    this.GLOBAL_TIMEOUT = options.globalTimeout || 600000; // 10 minutos default
+    this.MAX_RETRIES_PER_FILE = options.maxRetries || 1; // Tentar 1x (sem retry por default)
   }
 
   /**
@@ -41,13 +45,35 @@ class BatchProcessor {
     let completed = 0;
     let failed = 0;
 
+    // v4.1.3: Timeout global para prevenir travamentos
+    const startTime = Date.now();
+
     console.log(`[BatchProcessor] Iniciando processamento de ${total} arquivo(s)...`);
+    console.log(`[BatchProcessor] ⏱ Timeout global: ${this.GLOBAL_TIMEOUT / 1000}s`);
 
     // Atualizar status inicial
     this.updateProgress(0, total, 'Iniciando processamento em lote...');
 
     // Processar em lotes com concorrência controlada
     while (this.queue.length > 0 || this.active > 0) {
+      // v4.1.3: Verificar timeout global
+      const elapsed = Date.now() - startTime;
+      if (elapsed > this.GLOBAL_TIMEOUT) {
+        const remaining = this.queue.length;
+        console.error(`[BatchProcessor] ⏱ TIMEOUT GLOBAL após ${elapsed / 1000}s. Abortando ${remaining} arquivo(s) restante(s).`);
+
+        // Marcar arquivos restantes como erro
+        while (this.queue.length > 0) {
+          const item = this.queue.shift();
+          failed++;
+          this.errors.push({
+            file: item.file.name,
+            error: 'Timeout global do processamento em lote'
+          });
+        }
+
+        break;
+      }
       // Iniciar novos processamentos se há espaço
       while (this.active < this.maxConcurrency && this.queue.length > 0) {
         const item = this.queue.shift();
@@ -89,6 +115,8 @@ class BatchProcessor {
           })
           .finally(() => {
             this.active--;
+            // v4.1.3: Log de segurança para debug
+            console.log(`[BatchProcessor] Active workers: ${this.active}, Queue: ${this.queue.length}`);
           });
       }
 

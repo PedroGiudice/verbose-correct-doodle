@@ -453,32 +453,42 @@ async function extractFromPDF(file, options = {}) {
   // NOVO: Detectar se é escaneado
   let method = 'structural';
   let pages = [];
+  let ocrEngine = null; // v4.1.3: Declarar fora do bloco para garantir cleanup
 
   if (options.enableOCR && OCREngine.isAvailable()) {
-    const ocrEngine = new OCREngine();
-    const scanDetection = await ocrEngine.detectIfScanned(pdf);
+    ocrEngine = new OCREngine();
 
-    if (scanDetection.isScanned) {
-      updateProgress(30, 'PDF escaneado detectado. Iniciando OCR...');
-      console.log('[Main] PDF escaneado detectado. Usando OCR...');
+    try {
+      const scanDetection = await ocrEngine.detectIfScanned(pdf);
 
-      method = 'ocr';
+      if (scanDetection.isScanned) {
+        updateProgress(30, 'PDF escaneado detectado. Iniciando OCR...');
+        console.log('[Main] PDF escaneado detectado. Usando OCR...');
 
-      // Processar com OCR
-      const ocrResult = await ocrEngine.processScannedPDF(pdf, {
-        progressCallback: (progress) => {
-          const percent = 30 + (progress.percentage / 100) * 50; // 30-80%
-          updateProgress(percent, `OCR: página ${progress.current}/${progress.total}`);
-        }
-      });
+        method = 'ocr';
 
-      // Converter resultado OCR para formato de páginas
-      pages = ocrEngine.mergeOCRPages(ocrResult);
+        // Processar com OCR
+        const ocrResult = await ocrEngine.processScannedPDF(pdf, {
+          progressCallback: (progress) => {
+            const percent = 30 + (progress.percentage / 100) * 50; // 30-80%
+            updateProgress(percent, `OCR: página ${progress.current}/${progress.total}`);
+          }
+        });
 
-      updateProgress(80, 'OCR concluído. Aplicando ordem de leitura...');
-    } else {
-      updateProgress(30, 'Extraindo texto estrutural...');
-      method = 'structural';
+        // Converter resultado OCR para formato de páginas
+        pages = ocrEngine.mergeOCRPages(ocrResult);
+
+        updateProgress(80, 'OCR concluído. Aplicando ordem de leitura...');
+      } else {
+        updateProgress(30, 'Extraindo texto estrutural...');
+        method = 'structural';
+      }
+    } finally {
+      // v4.1.3: CRITICAL FIX - Garantir terminação do worker em qualquer caso
+      if (ocrEngine) {
+        await ocrEngine.terminate();
+        console.log('[Main] ✅ Worker OCR terminado com sucesso');
+      }
     }
   }
 

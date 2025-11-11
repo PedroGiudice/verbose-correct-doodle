@@ -377,8 +377,8 @@
 
       try {
         // Adicionar arquivos ao batch processor
-        modules.batchProcessor.clearQueue();
-        files.forEach(file => modules.batchProcessor.addFile(file));
+        modules.batchProcessor.reset();
+        modules.batchProcessor.addFiles(files);
 
         // Processar com callback de progresso
         const results = await modules.batchProcessor.processAll(async (file) => {

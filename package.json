@@ -1,6 +1,6 @@
 {
   "name": "preprocessador-juridico",
-  "version": "4.1.0",
+  "version": "4.1.3",
   "description": "Sistema de Extração Avançada de Documentos Processuais Eletrônicos Brasileiros",
   "main": "preprocessador-juridico-v4.html",
   "type": "module",
