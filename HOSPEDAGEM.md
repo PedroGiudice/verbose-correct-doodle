@@ -10,16 +10,43 @@ Este guia mostra como colocar o extrator online para acesso de qualquer lugar.
 
 2. **Ativar GitHub Pages:**
    - Vá em: Settings → Pages
-   - Em "Source", selecione: `main` branch
-   - Em "Folder", selecione: `/ (root)`
-   - Clique em "Save"
+   - Em "Build and deployment" → "Source"
+   - Selecione: **"GitHub Actions"** (NÃO "Deploy from a branch")
+   - O deploy é automático via workflow (`.github/workflows/pages.yml`)
+   - Após cada push na branch `main`, o site é atualizado automaticamente (1-2 min)
 
 3. **Acesse em:**
    ```
-   https://pedrogiudice.github.io/Extrator_PDF_Juridico/
+   https://pedrogiudice.github.io/verbose-correct-doodle/
    ```
 
-4. **Arquivo a usar:** O arquivo `index.html` será servido automaticamente.
+4. **Arquivo a usar:** O arquivo `index.html` (raiz) será servido automaticamente.
+   - Este é o Pré-Processador v4.1 Professional Edition
+
+### Como Funciona:
+
+Este repositório usa **GitHub Actions** para deploy automático:
+
+- ✅ **Workflow:** `.github/workflows/pages.yml` controla o deployment
+- ✅ **Arquivo `.nojekyll`:** Desabilita processamento Jekyll desnecessário
+- ✅ **Deploy da raiz:** Todo o repositório é servido como está (HTML estático)
+- ✅ **Automático:** Push na main → Build → Deploy (1-2 minutos)
+
+**Importante:** O arquivo `.nojekyll` é essencial para:
+- Evitar processamento Jekyll que causa erros
+- Servir arquivos HTML estáticos diretamente
+- Garantir que todas as pastas/arquivos sejam servidos corretamente
+
+### Troubleshooting:
+
+**Site não carrega / 404 Error:**
+- Verifique se Settings > Pages > Source está em **"GitHub Actions"**
+- Aguarde 2-3 minutos após o push para o deploy completar
+- Verifique a aba "Actions" para ver se o workflow executou com sucesso
+
+**Erro "Jekyll build failed":**
+- Certifique-se que o arquivo `.nojekyll` existe na raiz
+- Verifique que está usando **GitHub Actions** (não "Deploy from branch")
 
 ### Vantagens:
 - ✅ 100% gratuito
