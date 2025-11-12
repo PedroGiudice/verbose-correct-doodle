@@ -77,10 +77,10 @@ class OCREngine {
         console.log('[OCREngine] Inicializando Tesseract.js para português...');
         console.log('[OCREngine] ⏱ Timeout de inicialização: ' + (this.INIT_TIMEOUT / 1000) + 's');
 
-        // Criar worker com idioma português (COM TIMEOUT)
+        // v4.1.4: Criar worker (SEM especificar idioma - será carregado depois)
         // v4.1.2: Caminhos explícitos de CDN para evitar problemas CORS no GitHub Pages
         this.tesseract = await this._withTimeout(
-          Tesseract.createWorker('por', 1, {
+          Tesseract.createWorker({
             workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/worker.min.js',
             langPath: 'https://tessdata.projectnaptha.com/4.0.0',
             corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4/tesseract-core.wasm.js',
@@ -93,10 +93,29 @@ class OCREngine {
             }
           }),
           this.INIT_TIMEOUT,
-          'Inicialização do Tesseract'
+          'Criação do worker'
         );
 
-        console.log('[OCREngine] Worker criado, configurando parâmetros...');
+        console.log('[OCREngine] Worker criado, carregando idioma português...');
+
+        // v4.1.4: CRITICAL FIX - Carregar idioma explicitamente
+        // Fix: https://github.com/naptha/tesseract.js/issues/354
+        await this._withTimeout(
+          this.tesseract.loadLanguage('por'),
+          this.INIT_TIMEOUT,
+          'Carregamento do idioma'
+        );
+
+        console.log('[OCREngine] Idioma carregado, inicializando engine...');
+
+        // v4.1.4: CRITICAL FIX - Inicializar engine explicitamente
+        await this._withTimeout(
+          this.tesseract.initialize('por'),
+          this.INIT_TIMEOUT,
+          'Inicialização do engine'
+        );
+
+        console.log('[OCREngine] Engine inicializado, configurando parâmetros...');
 
         // Configurar parâmetros otimizados para documentos jurídicos (COM TIMEOUT)
         await this._withTimeout(
