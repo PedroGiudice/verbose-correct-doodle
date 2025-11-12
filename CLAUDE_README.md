@@ -705,10 +705,10 @@ Baseado na pesquisa técnica:
 
 ---
 
-**Versão:** 4.1.1 Enhanced
-**Data de Implementação:** 09/11/2025
-**Branch:** claude/brazilian-judicial-pdf-extraction-011CUwKrRfBjWyMjLA2T8TdE
-**Status:** ✅ Implementação completa, pronto para testes
+**Versão:** 4.1.3 (Hotfix Crítico)
+**Data de Implementação:** 11/11/2025
+**Branch:** main
+**Status:** ✅ Production-ready com correções críticas de OCR
 
 ---
 

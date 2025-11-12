@@ -40,6 +40,18 @@
   // ===== HELPER FUNCTIONS =====
 
   /**
+   * Sanitiza string HTML para prevenir XSS
+   * @param {string} str - String a ser sanitizada
+   * @returns {string} String sanitizada
+   */
+  function sanitizeHTML(str) {
+    if (typeof str !== 'string') return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /**
    * Lê blacklist do campo de texto (v4.1)
    * @returns {array} Array de strings a serem removidas
    */
@@ -50,9 +62,13 @@
     }
 
     // Dividir por linhas, remover vazias e trim
+    const MAX_LINES = 500; // Limite de linhas
+    const MAX_LINE_LENGTH = 500; // Limite de caracteres por linha
+
     return blacklistField.value
       .split('\n')
-      .map(line => line.trim())
+      .slice(0, MAX_LINES) // Limita número de linhas
+      .map(line => line.trim().substring(0, MAX_LINE_LENGTH)) // Limita tamanho de cada linha
       .filter(line => line.length > 0);
   }
 
@@ -259,7 +275,7 @@
           docTypeRow.className = 'stats-row';
           docTypeRow.innerHTML = `
             <span class="stats-label">Tipo de documento:</span>
-            <span class="stats-value">${state.documentAnalysis.name} (${state.documentAnalysis.confidence}%)</span>
+            <span class="stats-value">${sanitizeHTML(state.documentAnalysis.name)} (${state.documentAnalysis.confidence}%)</span>
           `;
 
           const statsBox = $('#statsBox');
@@ -365,10 +381,12 @@
         const div = document.createElement('div');
         div.style.padding = '0.5rem 0';
         div.style.borderBottom = '1px solid var(--border)';
+        const safeFileName = sanitizeHTML(file.name);
+        const safeFileId = file.name.replace(/[^a-zA-Z0-9]/g, '_');
         div.innerHTML = `
           <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-            <span>${file.name}</span>
-            <span id="status-${file.name.replace(/[^a-zA-Z0-9]/g, '_')}">Aguardando...</span>
+            <span>${safeFileName}</span>
+            <span id="status-${safeFileId}">Aguardando...</span>
           </div>
         `;
         batchProgressList.appendChild(div);

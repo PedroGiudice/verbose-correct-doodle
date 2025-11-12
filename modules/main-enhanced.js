@@ -29,6 +29,18 @@ function showSuccess(msg) {
   setTimeout(() => successBanner.style.display = 'none', 3000);
 }
 
+/**
+ * Sanitiza string HTML para prevenir XSS
+ * @param {string} str - String a ser sanitizada
+ * @returns {string} String sanitizada
+ */
+function sanitizeHTML(str) {
+  if (typeof str !== 'string') return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function updateProgress(percent, text) {
   const progressContainer = $('#progressContainer');
   const progressFill = $('#progressFill');
@@ -121,21 +133,21 @@ const SYSTEM_PATTERNS = {
 const RE = {
   // Hashes
   hexId: /\b(?:[A-Fa-f0-9]{32,64})\b/g,
-  sha: /\bSHA[- ]?(?:1|224|256|384|512):?\s*[A-Fa-f0-9]{16,}\b/gi,
-  md5: /\bMD5:?[\s-]*[A-Fa-f0-9]{16,}\b/gi,
+  sha: /\bSHA[- ]?(?:1|224|256|384|512):?\s{0,5}[A-Fa-f0-9]{16,128}\b/gi,
+  md5: /\bMD5:?[\s-]{0,3}[A-Fa-f0-9]{16,32}\b/gi,
 
-  // Protocolos
-  protocolo: /\b(Protocolo|ID|Documento|Validador|Autenticidade|C[óo]digo Verificador|C[óo]digo de Verifica[çc][ãa]o)[:\s#-]*[A-Za-z0-9\-\.\/]{6,}\b/gi,
+  // Protocolos (optimized - added upper bounds to prevent ReDoS)
+  protocolo: /\b(Protocolo|ID|Documento|Validador|Autenticidade|C[óo]digo Verificador|C[óo]digo de Verifica[çc][ãa]o)[:\s#-]{0,5}[A-Za-z0-9\-\.\/]{6,100}\b/gi,
 
   // Assinaturas digitais ICP-Brasil
-  icpBrasil: /\b(?:ICP-?Brasil|AC-?[A-Z]{2,}|Autoridade Certificadora|Certificado Digital|Cadeia de certifica[çc][ãa]o)\b/gi,
+  icpBrasil: /\b(?:ICP-?Brasil|AC-?[A-Z]{2,10}|Autoridade Certificadora|Certificado Digital|Cadeia de certifica[çc][ãa]o)\b/gi,
   assinaturaEletronica: /\b(?:Assinado (?:eletronicamente|digitalmente)|Documento assinado (?:eletronicamente|digitalmente)|Assinatura eletr[ôo]nica|Assinatura digital)\b/gi,
   carimboTempo: /\b(?:Carimbo de tempo|Timestamp|Data\/Hora da assinatura|Assinado em \d{2}\/\d{2}\/\d{4})\b/gi,
-  hashAssinatura: /\b(?:Hash do documento|Resumo criptogr[áa]fico|MessageDigest)\s*[:=]?\s*[A-Fa-f0-9]{32,}\b/gi,
-  certificadoSerial: /\b(?:N[úu]mero de s[ée]rie|Serial Number|N[úu]mero do certificado)[:\s]*[A-Fa-f0-9:]{16,}\b/gi,
-  emissorCertificado: /\b(?:Emissor|Emitido por|Issued by)[:\s]*(?:AC|CN=|O=)[^\n]{5,50}\b/gi,
-  validadeCertificado: /\b(?:V[áa]lido de|V[áa]lido at[ée]|Validade)[:\s]*\d{2}\/\d{2}\/\d{4}/gi,
-  selo: /\b(?:Selo|Carimbo|Autenticidade|Valida[çc][ãa]o|Valida\w+)\b/gi,
+  hashAssinatura: /\b(?:Hash do documento|Resumo criptogr[áa]fico|MessageDigest)\s{0,5}[:=]?\s{0,5}[A-Fa-f0-9]{32,128}\b/gi,
+  certificadoSerial: /\b(?:N[úu]mero de s[ée]rie|Serial Number|N[úu]mero do certificado)[:\s]{0,5}[A-Fa-f0-9:]{16,100}\b/gi,
+  emissorCertificado: /\b(?:Emissor|Emitido por|Issued by)[:\s]{0,5}(?:AC|CN=|O=)[^\n]{5,100}\b/gi,
+  validadeCertificado: /\b(?:V[áa]lido de|V[áa]lido at[ée]|Validade)[:\s]{0,5}\d{2}\/\d{2}\/\d{4}/gi,
+  selo: /\b(?:Selo|Carimbo|Autenticidade|Valida[çc][ãa]o|Valida\w{0,20})\b/gi,
 
   // Outros
   pageNum: /\b(?:p(?:á|a)gina|pag\.?|p\.)\s*\d+(?:\s*de\s*\d+)?\b/gi,
@@ -180,7 +192,14 @@ function getSelectedMode() {
 
 function getWhitelist() {
   const val = $('#whitelist').value || '';
-  return val.split(',').map(s => s.trim()).filter(Boolean);
+  const MAX_ITEMS = 100; // Limite de itens na whitelist
+  const MAX_ITEM_LENGTH = 200; // Limite de caracteres por item
+
+  return val
+    .split(',')
+    .slice(0, MAX_ITEMS) // Limita número de itens
+    .map(s => s.trim().substring(0, MAX_ITEM_LENGTH)) // Limita tamanho de cada item
+    .filter(Boolean);
 }
 
 function detectSystem(text) {
@@ -595,7 +614,7 @@ let lastResult = null;
 pdfInput.addEventListener('change', () => {
   const file = pdfInput.files?.[0];
   if (file) {
-    fileInfo.innerHTML = `<span class="file-name">${file.name}</span> (${(file.size / 1024).toFixed(1)} KB)`;
+    fileInfo.innerHTML = `<span class="file-name">${sanitizeHTML(file.name)}</span> (${(file.size / 1024).toFixed(1)} KB)`;
   } else {
     fileInfo.innerHTML = `<span class="file-name">Nenhum arquivo selecionado</span>`;
   }

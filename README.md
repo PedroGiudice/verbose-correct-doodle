@@ -2,7 +2,7 @@
 
 **Sistema de Extração Avançada de Documentos Processuais Eletrônicos Brasileiros**
 
-[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/PedroGiudice/verbose-correct-doodle)
+[![Version](https://img.shields.io/badge/version-4.1.3-blue.svg)](https://github.com/PedroGiudice/verbose-correct-doodle)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-production-success.svg)]()
 
@@ -23,6 +23,21 @@ Sistema **100% offline** e **client-side** para extração, limpeza e conversão
 - ✨ **NOVO v4.1: Organização de Autos** (cronologia automática)
 - ✨ **NOVO v4.1: Editor Markdown Standalone** (paste/write direto)
 - 🎨 **NOVO v4.1: Interface OLED-Friendly** (fundo preto, zero fadiga visual)
+
+---
+
+## ⚠️ Atualização Importante (v4.1.3 - 11/11/2025)
+
+**Hotfix Crítico - Atualização Altamente Recomendada:**
+
+- 🔧 **CORRIGIDO:** Memory leak do worker OCR causando travamentos no navegador
+- 🔧 **CORRIGIDO:** Falhas no processamento em lote após 2-3 arquivos escaneados
+- 🔧 **CORRIGIDO:** API inconsistente do BatchProcessor
+- ✨ **NOVO:** Timeout global configurável (10 min default)
+
+**Se você usa OCR ou processamento em lote, esta atualização é ESSENCIAL!**
+
+Ver detalhes completos em [CHANGELOG_v4.1.3.md](CHANGELOG_v4.1.3.md)
 
 ---
 
@@ -297,4 +312,4 @@ MIT License - Uso comercial permitido
 
 ---
 
-**Versão:** 4.1.1 Enhanced | **Última Atualização:** 09/11/2025
+**Versão:** 4.1.3 (Hotfix Crítico) | **Última Atualização:** 11/11/2025
